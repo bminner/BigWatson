@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Big Watson</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+    <div class="parent">
+        <div class="card querier">
+            <div class="container">
+                <div class="card title-bar">
+                    <img src="https://fontmeme.com/permalink/180122/941f6714f7cc930b103b85b77a74bd8f.png" alt="Big Watson">
+                </div>
+
+                <form class="form" role="search" action="./results.html">
+                    <input class="search-bar" placeholder="Enter your query" name="query-term" id="query-term" type="text">
+                    <button class="search-button" type="submit">
+                        Search
+                    </button>
+                </form>
+
+                <div class="slidecontainer">
+                    <p class="slider-label">Query outlook:</p>
+                    <i class="fa fa-minus" aria-hidden="true"></i>
+                    <input id="slider-outlook" class="slider" type="range" min="1" max="3" value="2">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                </div>
+
+                <div id="outlook-expression">
+                    <i class="fa fa-meh-o" aria-hidden="true"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./home.js"></script>
+</body>
+
+</html>
