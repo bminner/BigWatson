@@ -53,6 +53,10 @@ body {
     padding: 16px;
 }
 
+.article-container {
+    padding: 8px 8px;
+}
+
 .title-bar {
     color: #ffffff;
     background: #505662;
@@ -75,6 +79,7 @@ body {
     -webkit-border-radius: 50;
     -moz-border-radius: 50;
     border-radius: 50px;
+    border: none;
     padding: 16px 24px 16px 24px;
     font-size: 20px;
     width: 100%;    
@@ -87,7 +92,7 @@ body {
     -webkit-border-radius: 50;
     -moz-border-radius: 50;
     border-radius: 50px;
-    border: 0px;
+    border: none;
     font-family: Arial;
     color: #ffffff;
     font-size: 20px;
@@ -180,7 +185,7 @@ margin-left: -11px;
     text-decoration: none;
 }
 
-.result-card hr {
+hr {
     color: #ffffff;
     margin: 16px 0px 16px 0px;
     padding: 0;
@@ -191,6 +196,12 @@ h1 {
     font-weight: 300;
     line-height: 20px;
     text-align: center;
+}
+
+.article-container h2 {
+    margin: 0;
+    padding: 0;
+    font-weight: 300;
 }
 
 img {
