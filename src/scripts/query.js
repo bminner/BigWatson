@@ -7,10 +7,10 @@ if(queryTerm.length > 0) {
 
 var showingResults = document.getElementById("showing-results");
 var censorshipLevel = document.getElementById("censorship");
+var workingResult = document.getElementById("working-result");
 
 showingResults.innerHTML = "Showing results for: <strong>" + queryTerm + "</strong>";
 censorshipLevel.innerHTML = "Censorship: <strong>" + switchCensorship(censorship) + "</strong>";
-
 
 function getParameterByName(name, url) {
     if (!url) url = window.location.href;
