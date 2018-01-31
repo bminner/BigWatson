@@ -1,0 +1,19 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<style>
+    body {
+        background: #5e6472;
+    }
+</style>
+<div class="card results-backdrop">
+    <div class="result-container">
+        <p id="showing-results">Showing results for: <strong>{{ query }}</strong></p>
+        <p id="censorship">Censorship: <strong>{{ censorship }}</strong></p>
+        <div style="clear:both;"></div>
+    </div>
+    <a class="FAB" href="{% url 'index' %}">
+        <i class="fa fa-search FAB-icon" aria-hidden="true"></i>
+    </a>
+</div>
+{% endblock %}
