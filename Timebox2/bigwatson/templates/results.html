@@ -11,6 +11,13 @@
         <p id="showing-results">Showing results for: <strong>{{ query }}</strong></p>
         <p id="censorship">Censorship: <strong>{{ censorship }}</strong></p>
         <div style="clear:both;"></div>
+        {% for r in discovery_results %}
+            <div class="result-card" id="working-result">
+                <a href="{{ r.url }}">{{ r.title }}</a>
+                <hr>
+                <p>{{ r.summary }}</p>
+            </div>
+        {% endfor %}
     </div>
     <a class="FAB" href="{% url 'index' %}">
         <i class="fa fa-search FAB-icon" aria-hidden="true"></i>
