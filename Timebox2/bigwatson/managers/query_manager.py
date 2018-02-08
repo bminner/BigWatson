@@ -15,7 +15,7 @@ def query_discovery(query):
     """ Returns a list of Articles by querying the Discovery service """
 
     filter_string = query
-    qopts = {'query': query, 'filter': filter_string, 'count':5,
+    qopts = {'query': query, 'filter': filter_string, 'count':1,
              'return': 'title, url, text, enriched_text.sentiment.document.score'}
     discovery_query = discovery.query(DISC_ENVIRONMENT_ID, DISC_COLLECTION_ID, qopts)
 
