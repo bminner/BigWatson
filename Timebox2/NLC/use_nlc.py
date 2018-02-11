@@ -20,7 +20,7 @@ def classify_sentence(text):
 
 
 def __main__():
-    text = "good"
+    text = "i love you"
 
     print(classify_sentence(text))
 
