@@ -18,9 +18,28 @@ def results(request):
     censorship_dict = {'1':'Negative', '2':'Neutral', '3':'Positive'}
 
     discovery_results = qm.query_discovery(query)
+    
+    result_bodies = []
+    for r in discovery_results:
+        result_bodies.append(r.body)
+    
+    request.session['results'] = result_bodies
 
     return render(
         request,
         'results.html',
         context={'query':query, 'censorship':censorship_dict[censorship], 'discovery_results':discovery_results}
+    )
+
+def result(request):
+    result_bodies = request.session.get('results', '')
+    index = request.GET.get('resultId', '')
+    title = request.GET.get('title', '')
+
+    body = result_bodies[int(index)]
+    
+    return render(
+        request,
+        'result.html',
+        context={'title':title, 'body': body}
     )

@@ -1,4 +1,5 @@
 from ..models.Article import Article
+from ..managers import webscraper
 from watson_developer_cloud import DiscoveryV1
 
 
@@ -13,24 +14,22 @@ discovery = DiscoveryV1(
 def query_discovery(query):
     """ Returns a list of Articles by querying the Discovery service """
 
-    qopts = {'query': query, 'filter': query, 'count':5,
-             'return': 'title, url, text, enriched_text.sentiment.document.score'}
-    discovery_query = discovery.query(DISC_ENVIRONMENT_ID, DISC_COLLECTION_ID, qopts)
+    discovery_query = discovery.query(environment_id=DISC_ENVIRONMENT_ID,
+                                     collection_id=DISC_COLLECTION_ID,
+                                     natural_language_query=query,
+                                     return_fields=['title', 'url', 'text', 'enriched_text.sentiment.document.score'],
+                                     count=5)
+
     discovery_results = []
     for result in discovery_query['results']:
         title = result['title']
         url = result['url']
-        summary = clean_summary(result['text'], title)
+        print(url + '/n')
+        article_data = webscraper.get_article_data(url)
+        summary = article_data['summary']
+        body = article_data['body']
         sentiment_score = result['enriched_text']['sentiment']['document']['score']
 
-        discovery_results.append(Article(title, url, summary, sentiment_score=sentiment_score))
+        discovery_results.append(Article(title, url, summary, body, sentiment_score))
 
     return discovery_results
-
-def clean_summary(text, title):
-    """ Removes title and shortens summary from Discovery text result """
-    summary = text.replace(title, '')
-    summary = (summary[:160] + '...') if len(summary) > 160 else summary
-
-    return summary
-
