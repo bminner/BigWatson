@@ -8,7 +8,7 @@ def get_article_data(url):
     Returns dictionary of summary as a string and body as a list of strings (paragraphs)
     """
 
-    g = Goose()
+    g = Goose({'strict': False})
     article = g.extract(url=url)
     data = {'summary': '', 'body': ''}
     summary = article.meta_description
@@ -17,9 +17,3 @@ def get_article_data(url):
     data['body'] = article.cleaned_text
 
     return data
-
-
-def trim_summary(summary):
-    summary = (summary[:160] + '...') if len(summary) > 160 else summary
-
-    return summary

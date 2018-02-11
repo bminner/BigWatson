@@ -12,13 +12,15 @@
         <p id="censorship">Censorship: <strong>{{ censorship }}</strong></p>
         <div style="clear:both;"></div>
         {% for r in discovery_results %}
-            <div class="result-card" id="working-result">
-                <a href="{% url 'result' %}?title={{ r.title }}&resultId={{ forloop.counter0 }}">{{ r.title }}</a>
-                {% if r.summary|length > 0 %}
-                    <hr>
-                    <p>{{ r.summary }}</p>
-                {% endif %}
-            </div>
+            {% if r.body|length > 0 %}
+                <div class="result-card" id="working-result">
+                    <a href="{% url 'result' %}?title={{ r.title }}&resultId={{ forloop.counter0 }}">{{ r.title }}</a>
+                    {% if r.summary|length > 0 %}
+                        <hr>
+                        <p>{{ r.summary }}</p>
+                    {% endif %}
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
     <a class="FAB" href="{% url 'index' %}">

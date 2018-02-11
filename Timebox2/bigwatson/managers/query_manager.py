@@ -14,15 +14,17 @@ discovery = DiscoveryV1(
 def query_discovery(query):
     """ Returns a list of Articles by querying the Discovery service """
 
-    filter_string = query
-    qopts = {'query': query, 'filter': filter_string, 'count':5,
-             'return': 'title, url, text, enriched_text.sentiment.document.score'}
-    discovery_query = discovery.query(DISC_ENVIRONMENT_ID, DISC_COLLECTION_ID, qopts)
+    discovery_query = discovery.query(environment_id=DISC_ENVIRONMENT_ID,
+                                     collection_id=DISC_COLLECTION_ID,
+                                     natural_language_query=query,
+                                     return_fields=['title', 'url', 'text', 'enriched_text.sentiment.document.score'],
+                                     count=5)
 
     discovery_results = []
     for result in discovery_query['results']:
         title = result['title']
         url = result['url']
+        print(url + '/n')
         article_data = webscraper.get_article_data(url)
         summary = article_data['summary']
         body = article_data['body']
