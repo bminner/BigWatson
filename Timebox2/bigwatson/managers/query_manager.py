@@ -1,5 +1,6 @@
 from ..models.Article import Article
 from ..managers import webscraper
+from ..managers import censor_manager
 from watson_developer_cloud import DiscoveryV1
 
 
@@ -18,7 +19,7 @@ def query_discovery(query):
                                      collection_id=DISC_COLLECTION_ID,
                                      natural_language_query=query,
                                      return_fields=['title', 'url', 'text', 'enriched_text.sentiment.document.score'],
-                                     count=5)
+                                     count=2)
 
     discovery_results = []
     for result in discovery_query['results']:
@@ -32,4 +33,5 @@ def query_discovery(query):
 
         discovery_results.append(Article(title, url, summary, body, sentiment_score))
 
-    return discovery_results
+    censor_results = censor_manager.censor(discovery_results)
+    return censor_results
