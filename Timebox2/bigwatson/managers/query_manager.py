@@ -33,5 +33,4 @@ def query_discovery(query):
 
         discovery_results.append(Article(title, url, summary, body, sentiment_score))
 
-    censor_results = censor_manager.censor(discovery_results)
-    return censor_results
+    return discovery_results
