@@ -16,7 +16,16 @@ def classify_sentence(text):
 
     #real classifier
     classes = natural_language_classifier.classify(CLASSIFIER_ID, text)
-    return json.dumps(classes, indent=2)
+    #print(json.dumps(classes, indent=2))
+
+
+    #TODO THIS IS BAD
+    pos_conf = 0
+    for cls in classes["classes"]:
+        if cls["class_name"] == "positive":
+            pos_conf = cls['confidence']
+
+    return classes['top_class'], pos_conf
 
 
 def __main__():
@@ -25,4 +34,4 @@ def __main__():
     print(classify_sentence(text))
 
 
-__main__()
+#__main__()
