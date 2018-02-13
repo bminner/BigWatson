@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .managers import query_manager as qm
+from .managers import censor_manager as cm
 
 
 # Create your views here.
@@ -15,12 +16,13 @@ def index(request):
 def results(request):
     query = request.GET.get('query', '')
     censorship = request.GET.get('censorship', '')
-    censorship_dict = {'1':'Negative', '2':'Neutral', '3':'Positive'}
+    censorship_dict = {'1':'negative', '2':'neutral', '3':'positive'}
 
     discovery_results = qm.query_discovery(query)
+    censored_results = cm.censor_results(discovery_results, censorship_dict[censorship])
     
     result_bodies = []
-    for r in discovery_results:
+    for r in censored_results:
         result_bodies.append(r.body)
     
     request.session['results'] = result_bodies
@@ -28,7 +30,7 @@ def results(request):
     return render(
         request,
         'results.html',
-        context={'query':query, 'censorship':censorship_dict[censorship], 'discovery_results':discovery_results}
+        context={'query':query, 'censorship':censorship_dict[censorship], 'discovery_results':censored_results}
     )
 
 def result(request):

@@ -19,13 +19,13 @@ def classify_sentence(text):
     #print(json.dumps(classes, indent=2))
 
 
-    #TODO THIS IS BAD
-    pos_conf = 0
+    #TODO THIS IS BAD  is there another field for this?
+    top_class = classes['top_class']
     for cls in classes["classes"]:
-        if cls["class_name"] == "positive":
-            pos_conf = cls['confidence']
+        if cls["class_name"] == top_class:
+            top_conf = cls['confidence']
 
-    return classes['top_class'], pos_conf
+    return classes['top_class'], top_conf
 
 
 def __main__():
