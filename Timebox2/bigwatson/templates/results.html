@@ -1,4 +1,11 @@
+<!-- author: Kurtis -->
 {% extends "base_generic.html" %}
+
+{% block title %}
+    {% if query|length > 0 %}
+        {{ query }} | Big Watson
+    {% endif %}
+{% endblock %}
 
 {% block content %}
 <style>

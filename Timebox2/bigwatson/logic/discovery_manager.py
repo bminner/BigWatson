@@ -1,6 +1,9 @@
+__author__ = 'Kurtis'
+
 from ..models.Article import Article
-from ..managers import webscraper
+from ..logic.helpers import QueryHelper
 from watson_developer_cloud import DiscoveryV1
+from goose3 import Goose
 
 
 DISC_COLLECTION_ID = "news-en"
@@ -11,25 +14,20 @@ discovery = DiscoveryV1(
     version="2017-11-07"
 )
 
+
 def query_discovery(query):
     """ Returns a list of Articles by querying the Discovery service """
 
     discovery_query = discovery.query(environment_id=DISC_ENVIRONMENT_ID,
                                      collection_id=DISC_COLLECTION_ID,
                                      natural_language_query=query,
-                                     return_fields=['title', 'url', 'text', 'enriched_text.sentiment.document.score'],
+                                     return_fields=['title', 'url', 'enriched_text.sentiment.document.score'],
                                      count=5)
 
-    discovery_results = []
-    for result in discovery_query['results']:
-        title = result['title']
-        url = result['url']
-        print(url + '/n')
-        article_data = webscraper.get_article_data(url)
-        summary = article_data['summary']
-        body = article_data['body']
-        sentiment_score = result['enriched_text']['sentiment']['document']['score']
+    # build QueryHelper with Goose extractor
+    goose_extractor = Goose({'strict':False})
+    qh = QueryHelper(goose_extractor)
 
-        discovery_results.append(Article(title, url, summary, body, sentiment_score))
+    discovery_results = qh.parse_discovery_results(discovery_query['results'])
 
     return discovery_results

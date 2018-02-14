@@ -1,3 +1,4 @@
+<!-- author: Kurtis -->
 {% extends "base_generic.html" %}
 
 {% block content %}
@@ -11,7 +12,7 @@
         <div class="article-container">
             <h2>{{ title }}</h2>
             <hr>
-            {{ body }}
+            {{ body|safe }}
         </div>
     </div>
     <a class="FAB" href="javascript:history.back()">
