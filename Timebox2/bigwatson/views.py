@@ -1,9 +1,12 @@
+__author__ = 'Kurtis'
+
 from django.shortcuts import render
-from .managers import query_manager as qm
-from .managers import censor_manager as cm
+from .logic import discovery_manager as dm
+from .logic import censor_manager as cm
+from django.views.decorators.cache import cache_page
+import logging
 
 
-# Create your views here.
 def index(request):
     big_watson = 'Big Watson'
 
@@ -13,32 +16,55 @@ def index(request):
         context={'big_watson':big_watson}
     )
 
+
+@cache_page(60 * 15)
 def results(request):
     query = request.GET.get('query', '')
     censorship = request.GET.get('censorship', '')
-    censorship_dict = {'1':'negative', '2':'neutral', '3':'positive'}
+    # Dictionary for easy conversion from censorship value to description
+    censorship_dict = {'1':'Negative', '2':'Neutral', '3':'Positive'}
 
-    discovery_results = qm.query_discovery(query)
-    censored_results = cm.censor_results(discovery_results, censorship_dict[censorship])
-    
+    censorship_desc = ''
+    try:
+        censorship_desc = censorship_dict[censorship]
+    except KeyError:
+        censorship = '2'
+        censorship_desc = 'Neutral'
+        logging.exception('Invalid censorship value provided')
+    except:
+        raise
+
+    discovery_results = dm.query_discovery(query)
+    censored_results = cm.censor_results(discovery_results, censorship_desc)
+
     result_bodies = []
     for r in censored_results:
         result_bodies.append(r.body)
     
+    # Store body data in session for use across different views
     request.session['results'] = result_bodies
 
     return render(
         request,
         'results.html',
-        context={'query':query, 'censorship':censorship_dict[censorship], 'discovery_results':censored_results}
+        context={'query':query, 'censorship':censorship_desc, 'discovery_results':censored_results}
     )
 
+
+@cache_page(60 * 15)
 def result(request):
     result_bodies = request.session.get('results', '')
-    index = request.GET.get('resultId', '')
+    index = request.GET.get('resultId', '0')
     title = request.GET.get('title', '')
 
-    body = result_bodies[int(index)]
+    body = ''
+    try:
+        body = result_bodies[int(index)] if index != '' else None
+    except IndexError:
+        body = 'ERROR: No article text found for result ID'
+        logging.exception('Invalid result ID provided')
+    except:
+        raise
     
     return render(
         request,
