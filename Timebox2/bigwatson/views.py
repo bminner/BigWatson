@@ -2,6 +2,7 @@ __author__ = 'Kurtis'
 
 from django.shortcuts import render
 from .logic import discovery_manager as dm
+from .logic import censor_manager as cm
 from django.views.decorators.cache import cache_page
 import logging
 
@@ -34,9 +35,10 @@ def results(request):
         raise
 
     discovery_results = dm.query_discovery(query)
-    
+    censored_results = cm.censor_results(discovery_results, censorship_desc)
+
     result_bodies = []
-    for r in discovery_results:
+    for r in censored_results:
         result_bodies.append(r.body)
     
     # Store body data in session for use across different views
@@ -45,7 +47,7 @@ def results(request):
     return render(
         request,
         'results.html',
-        context={'query':query, 'censorship':censorship_desc, 'discovery_results':discovery_results}
+        context={'query':query, 'censorship':censorship_desc, 'discovery_results':censored_results}
     )
 
 
