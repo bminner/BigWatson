@@ -21,10 +21,10 @@
         {% for r in discovery_results %}
             {% if r.body|length > 0 %}
                 <div class="result-card" id="working-result">
-                    <a href="{% url 'result' %}?title={{ r.title }}&resultId={{ forloop.counter0 }}">{{ r.title }}</a>
+                    <a href="{% url 'result' %}?title={{ r.title }}&resultId={{ forloop.counter0 }}">{{ r.title|safe }}</a>
                     {% if r.summary|length > 0 %}
                         <hr>
-                        <p>{{ r.summary }}</p>
+                        <p>{{ r.summary|safe }}</p>
                     {% endif %}
                 </div>
             {% endif %}
