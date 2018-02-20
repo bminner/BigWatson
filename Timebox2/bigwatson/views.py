@@ -35,7 +35,7 @@ def results(request):
         raise
 
     discovery_results = dm.query_discovery(query)
-    censored_results = cm.censor_results(discovery_results, censorship_desc)
+    censored_results = cm.censor_results(discovery_results, censorship_desc.lower())
 
     result_bodies = []
     for r in censored_results:
@@ -43,6 +43,7 @@ def results(request):
     
     # Store body data in session for use across different views
     request.session['results'] = result_bodies
+    request.session['censorship'] = censorship_desc.lower()
 
     return render(
         request,
@@ -54,6 +55,7 @@ def results(request):
 @cache_page(60 * 15)
 def result(request):
     result_bodies = request.session.get('results', '')
+    censorship = request.session.get('censorship', '')
     index = request.GET.get('resultId', '0')
     title = request.GET.get('title', '')
 
@@ -66,6 +68,8 @@ def result(request):
     except:
         raise
     
+    body = cm.censor_body(body, censorship)
+
     return render(
         request,
         'result.html',

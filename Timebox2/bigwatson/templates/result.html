@@ -10,7 +10,7 @@
 <div class="card results-backdrop">
     <div class="result-container">
         <div class="article-container">
-            <h2>{{ title }}</h2>
+            <h2>{{ title|safe }}</h2>
             <hr>
             {{ body|safe }}
         </div>
