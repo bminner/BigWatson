@@ -1,0 +1,22 @@
+<!-- author: Kurtis -->
+{% extends "base_generic.html" %}
+
+{% block content %}
+<style>
+    body {
+        background: #5e6472;
+    }
+</style>
+<div class="card results-backdrop">
+    <div class="result-container">
+        <div class="article-container">
+            <h2>{{ title|safe }}</h2>
+            <hr>
+            {{ body|safe }}
+        </div>
+    </div>
+    <a class="FAB" href="javascript:history.back()">
+        <i class="fa fa-arrow-left FAB-icon" aria-hidden="true"></i>
+    </a>
+</div>
+{% endblock %}

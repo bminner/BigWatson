@@ -1,3 +1,6 @@
+/**
+ * @author Kurtis
+ */
 window.onload = function () {
     var slider = document.getElementById("effect-slider");
     var expression = document.getElementById("effect-expression");
