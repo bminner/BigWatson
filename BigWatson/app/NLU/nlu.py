@@ -21,13 +21,13 @@ def analyze_sentence(text_to_analyze):
         text=text_to_analyze,
         features=Features(
             entities=EntitiesOptions(
-                emotion=False,
+                emotion=True,
                 sentiment=True,
-                limit=2),
+                limit=10),
             keywords=KeywordsOptions(
-                emotion=False,
+                emotion=True,
                 sentiment=True,
-                limit=2),
+                limit=10),
             categories=CategoriesOptions()
         )
     )
