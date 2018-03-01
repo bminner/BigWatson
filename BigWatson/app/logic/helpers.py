@@ -1,6 +1,13 @@
 __author__ = 'Kurtis'
 
+import os
+dir_path = os.path.dirname(os.path.realpath(__file__))
 from ..models.Article import Article
+from nltk.data import path as nltk_path
+nltk_path.append(dir_path + '/nltk_data')
+from nltk.corpus import wordnet as wn
+from nltk.tag import pos_tag
+from nltk.tokenize import word_tokenize
 
 
 class QueryHelper:
@@ -51,3 +58,78 @@ class QueryHelper:
         data['body'] = article.cleaned_text.replace('\n', '</p><p>')
 
         return data
+
+
+class WordNetHelper:
+    """
+    Helper class that uses WordNet to get replacement hypernyms/antonyms
+    for words to be censored.
+    """
+    def __init__(self, wordnet_client):
+        self.wordnet_client = wordnet_client
+
+    def censor_text(self, text):
+        """
+        Censors given text by changing all adjectives to their antonyms and
+        makes all nouns less polarized and more generic.
+        """
+
+        adjs_and_nouns = self.tag_text(text)
+        modified_adjs = self.replace_adjectives_with_antonym(text, adjs_and_nouns['adjs'])
+        modified_adjs_and_nouns = self.replace_nouns_with_hypernyms(modified_adjs, adjs_and_nouns['nouns'])
+
+        return modified_adjs_and_nouns
+
+    def tag_text(self, text):
+        """ tags given text and returns dictionary of adjectives and nouns for modification. """
+        adjs_and_nouns = {'adjs': [], 'nouns': []}
+        tagged_text = pos_tag(word_tokenize(text))
+        
+        for wordtag in tagged_text:
+            if wordtag[1] == 'JJ':
+                adjs_and_nouns['adjs'].append(wordtag[0])
+            elif wordtag[1] == 'NN' or wordtag[1] == 'NNS':
+                adjs_and_nouns['nouns'].append(wordtag[0])
+        
+        return adjs_and_nouns
+
+    def replace_adjectives_with_antonym(self, text, adjective_seq):
+        """ Replaces adjectives in given text with antonyms. """
+
+        antonyms = []
+
+        for adj in adjective_seq:
+            syns = self.wordnet_client.synsets(adj, pos=['a','s'])
+            antonym = '<del>' + adj + '</del>'
+
+            for s in syns:
+                for l in s.lemmas():
+                    if l.antonyms():
+                        antonym = '<strong>' + l.antonyms()[0].name() + '</strong>'
+
+            antonyms.append((adj, antonym))
+
+        for adjant in antonyms:
+            text = text.replace(adjant[0], adjant[1], 1)
+            
+        return text
+
+    def replace_nouns_with_hypernyms(self, text, noun_seq):
+        """ Replaces nouns in text with hypernyms (more generic versions). """
+
+        hypernyms = []
+
+        for noun in noun_seq:
+            syns = self.wordnet_client.synsets(noun, pos=['n'])
+            hypernym = '<del>' + noun + '</del>'
+
+            for s in syns:
+                if s.hypernyms():
+                    hypernym = '<strong>' + s.hypernyms()[0].name().split('.')[0] + '</strong>'
+            
+            hypernyms.append((noun, hypernym))
+        
+        for nounhyp in hypernyms:
+            text = text.replace(nounhyp[0], nounhyp[1], 1)
+
+        return text
