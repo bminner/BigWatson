@@ -10,8 +10,8 @@ class SeqTable:
         """Looks up the given index in the sequence table.
 
             Returns a 3-tuple of: the sequence s in which 'index' lies, the
-            cumulative index at which s begins, and the relative location of
-            index in s (index - s_start)
+            index of s in the parent sequence, and the relative location of
+            'index' in s (index - start of s).
         """
         assert index >= 0
         assert index < self.total_len
@@ -25,4 +25,4 @@ class SeqTable:
         elif index >= tlen + len(seq):
             return self._lookup(index, seqs[mid:])
         else:
-            return seq, tlen, index - tlen
+            return seq, mid, index - tlen
