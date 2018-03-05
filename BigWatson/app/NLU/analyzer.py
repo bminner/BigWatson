@@ -4,7 +4,7 @@ from watson_developer_cloud.natural_language_understanding_v1 import *
 def analyze(text):
     """Analyzes the given text and returns a generator of Entity objects."""
     response = nlu.analyze(
-        url='http://www.newsweek.com/trump-worst-president-ever-thats-patently-absurd-814948',
+        text=text,
         features=Features(
             entities=EntitiesOptions(
                 sentiment=True,
