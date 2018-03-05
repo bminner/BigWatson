@@ -1,7 +1,8 @@
-import json
+from NLU import nlu
+from watson_developer_cloud.natural_language_understanding_v1 import *
 
-def analyze_article(article):
-    """Analyzes the given 'Article' and returns a generator of Entity objects."""
+def analyze(text):
+    """Analyzes the given text and returns a generator of Entity objects."""
     response = nlu.analyze(
         url='http://www.newsweek.com/trump-worst-president-ever-thats-patently-absurd-814948',
         features=Features(
@@ -13,10 +14,10 @@ def analyze_article(article):
         )
     )
 
-    return self._parse_entities(response)
+    return _parse_entities(response)
 
 
-def _parse_entities(self, response):
+def _parse_entities(response):
     entities = response['entities']
     for e in entities:
         name = e['text']
@@ -32,3 +33,7 @@ class Entity:
         self.type = ttype
         self.sentiment_score = sentiment_score
         self.mentions = mentions
+
+    def __repr__(self):
+        return 'Name: {0} | Type: {1} | Sentiment: {2} | Mentions: {3}'.format(
+            self.name, self.type, self.sentiment_score, self.mentions)
