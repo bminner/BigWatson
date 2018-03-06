@@ -3,7 +3,6 @@ __author__ = 'Brandon'
 from ..NLU.seqtable import SeqTable
 from ..NLU.analyzer import analyze, Entity
 from ..models import Article
-from nltk.tokenize import sent_tokenize
 
 def censor_sentences(sentences, table, entities, good_class):
     POSSIBLE_CLASSES = ['positive', 'negative']
@@ -23,13 +22,16 @@ def censor_sentences(sentences, table, entities, good_class):
         for location in locations:
             index_tuple = table.lookup(location)
             sent_index = sentences.index(index_tuple[0])
+            #TODO Censor by specific word using Kurt's stuff
+            #censor_words(sentences[sent_index]) 
             sentences[sent_index] = '<del>' + index_tuple[0] + '</del>'
     
     return sentences
 
 def censor_body(body, good_class):
 
-    sentences = sent_tokenize(body)
+    sentences = body.split(".")
+    #sentences = sent_tokenize(body)
     table = SeqTable(sentences)
     entity_generator = analyze(body)
     entities = list(entity_generator)
@@ -43,14 +45,16 @@ def censor_title_and_summary(article, good_class):
     censored = Article.Article.from_article(article)
 
     summary = censored.summary
-    summary_sents = sent_tokenize(summary)
+    summary_sents = summary.split(".")
+    #summary_sents = sent_tokenize(summary)
     summary_table = SeqTable(summary_sents)
     entity_generator = analyze(summary)
     summary_entities = list(entity_generator)
     summary_sents = censor_sentences(summary_sents, summary_table, summary_entities, good_class)
 
     title = censored.title
-    title_sents = sent_tokenize(title)
+    title_sents = title.split(".")
+    #title_sents = sent_tokenize(title)
     title_table = SeqTable(title_sents)
     entity_generator = analyze(title)
     title_entities = list(entity_generator)
