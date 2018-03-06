@@ -3,6 +3,7 @@ __author__ = 'Kurtis'
 from django.test import TestCase
 import json
 from ..logic.helpers import QueryHelper
+from ..logic.nlu_censor_manager import censor_body
 
 
 class HelpersTest(TestCase):
@@ -77,6 +78,18 @@ class HelpersTest(TestCase):
             self.assertEqual(suffix, result.sentiment_score)
             suffix += 1
     
+class NLUTest(TestCase):
+    def test_censor_body(self):
+        body = "Donald Trump is an idiot and awful president.Cats are cool and I like bunnies.North Korea hates all things that are good."
+        good_class = 'positive'
+        result = censor_body(body, good_class)
+        print(result)
+        censored_result = "<del>Donald Trump is an idiot and awful president.</del>Cats are cool and I like bunnies.<del>North Korea hates all things that are good.</del>"
+        self.assertEqual(censored_result,result)
+
+
+
+
 
 class MockExtractor():
     """ Object used in place of Goose to unit test get_article_data() """

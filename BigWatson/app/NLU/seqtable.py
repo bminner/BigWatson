@@ -3,7 +3,7 @@ class SeqTable:
         self.seqs = []
         self.total_len = 0
         for seq in seqlist:
-            seqs.append((seq, self.total_len))
+            self.seqs.append((seq, self.total_len))
             self.total_len += len(seq)
 
     def lookup(self, index):
@@ -18,7 +18,7 @@ class SeqTable:
         return self._lookup(index, self.seqs)
 
     def _lookup(self, index, seqs):
-        mid = len(seqs) / 2
+        mid = int(len(seqs) / 2)
         seq, tlen = seqs[mid]
         if index < tlen:
             return self._lookup(index, seqs[:mid])

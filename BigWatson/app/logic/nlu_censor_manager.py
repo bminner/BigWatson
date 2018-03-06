@@ -18,9 +18,14 @@ def censor_sentences(sentences, table, entities, good_class):
             censored_entities.append(e)
 
     for ce in censored_entities:
-        locations = ce.mentions
+        #locations = ce.mentions[0][1]
+        locations = []
+        for mention in ce.mentions:
+            locations += mention[1]
         for location in locations:
-            index_tuple = table.lookup(location)
+            sent, parent_index, relative_index = table.lookup(location)
+            print("Index tuple = " + str(index_tuple))
+            print("Sentences = " + str(sentences))
             sent_index = sentences.index(index_tuple[0])
             #TODO Censor by specific word using Kurt's stuff
             #censor_words(sentences[sent_index]) 
