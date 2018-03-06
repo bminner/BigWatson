@@ -72,6 +72,7 @@ class WordNetHelper:
         """
         Censors given text by changing all adjectives to their antonyms and
         makes all nouns less polarized and more generic.
+        NOTE: This is the main function you should be using with this helper.
         """
 
         adjs_and_nouns = self.tag_text(text)
@@ -81,7 +82,8 @@ class WordNetHelper:
         return modified_adjs_and_nouns
 
     def tag_text(self, text):
-        """ tags given text and returns dictionary of adjectives and nouns for modification. """
+        """ tags given text by POS and returns dictionary of adjectives and nouns for modification. """
+
         adjs_and_nouns = {'adjs': [], 'nouns': []}
         tagged_text = pos_tag(word_tokenize(text))
         
@@ -101,11 +103,15 @@ class WordNetHelper:
         for adj in adjective_seq:
             syns = self.wordnet_client.synsets(adj, pos=['a','s'])
             antonym = '<del>' + adj + '</del>'
-
-            for s in syns:
-                for l in s.lemmas():
-                    if l.antonyms():
-                        antonym = '<strong>' + l.antonyms()[0].name() + '</strong>'
+            
+            try:
+                for s in syns:
+                    for l in s.lemmas():
+                        if l.antonyms():
+                            antonym = '<strong>' + l.antonyms()[0].name() + '</strong>'
+                            raise AntonymFound
+            except:
+                pass
 
             antonyms.append((adj, antonym))
 
@@ -126,6 +132,7 @@ class WordNetHelper:
             for s in syns:
                 if s.hypernyms():
                     hypernym = '<strong>' + s.hypernyms()[0].name().split('.')[0] + '</strong>'
+                    break
             
             hypernyms.append((noun, hypernym))
         
@@ -133,3 +140,11 @@ class WordNetHelper:
             text = text.replace(nounhyp[0], nounhyp[1], 1)
 
         return text
+
+
+class AntonymFound(Exception):
+    """ used to break nested for loops. Yay python. """
+
+    def __init__(self, message='AntonymFound'):
+        self.message = message
+        
