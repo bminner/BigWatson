@@ -74,12 +74,13 @@ class WordNetHelper:
         makes all nouns less polarized and more generic.
         NOTE: This is the main function you should be using with this helper.
         """
+        self.wordnet_client.ensure_loaded()
 
         adjs_and_nouns = self.tag_text(text)
         modified_adjs = self.replace_adjectives_with_antonym(text, adjs_and_nouns['adjs'])
-        modified_adjs_and_nouns = self.replace_nouns_with_hypernyms(modified_adjs, adjs_and_nouns['nouns'])
+        # modified_adjs_and_nouns = self.replace_nouns_with_hypernyms(modified_adjs, adjs_and_nouns['nouns'])
 
-        return modified_adjs_and_nouns
+        return modified_adjs
 
     def tag_text(self, text):
         """ tags given text by POS and returns dictionary of adjectives and nouns for modification. """
@@ -132,6 +133,7 @@ class WordNetHelper:
             for s in syns:
                 if s.hypernyms():
                     hypernym = '<strong>' + s.hypernyms()[0].name().split('.')[0] + '</strong>'
+                    hypernym = hypernym.replace('_', ' ')
                     break
             
             hypernyms.append((noun, hypernym))
