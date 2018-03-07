@@ -110,6 +110,8 @@ class HelpersTest(TestCase):
         self.assertEqual('the dog is a <strong>bad</strong> boy', edited_to_be_negative)
         self.assertEqual('the dog is a <strong>good</strong> boy', edited_to_be_positive)
 
+    """
+    # these tests use hypernyms, which we won't be using quite yet, so they're commented out.
     def test_replace_noun_with_hypernyms_replaces_noun(self):
         helper = self.create_mock_wordnet_helper()
         text = 'the dog is a good boy'
@@ -126,6 +128,7 @@ class HelpersTest(TestCase):
         censored_text = helper.censor_text(text)
 
         self.assertEqual('the <strong>canine</strong> is a <strong>bad</strong> <strong>male</strong>', censored_text)
+    """
 
 
 class MockExtractor():
