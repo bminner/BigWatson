@@ -1,5 +1,10 @@
 from ..models import Article
 from ..NLC.use_nlc import classify_sentence
+from ..logic.helpers import WordNetHelper
+from nltk.corpus import wordnet as wn
+
+helper = WordNetHelper(wn)
+
 
 # takes in discovery results in the form of an Article array from query_manager
 # returns array of censored Article objects
@@ -44,15 +49,18 @@ def censor_body(body, good_class):
                     print("Strong Feelings: " + sentence)
                 except UnicodeEncodeError:
                     print("unicode shit")
-                sentences[i] = '<del>' + sentence + '</del>'
+                sentences[i] = helper.censor_text(sentence)
+                print("Old Sentence: " + sentence)
+                print("Changed sentence: " + sentences[i])
         #if not what we're aiming for
         elif cls != good_class and conf > .4:
             try:
                 print("Bad hombre:" + sentence)
             except UnicodeEncodeError:
                 print("unicode shit")
-            sentences[i] = '<del>' + sentence + '</del>'
-
+            sentences[i] = helper.censor_text(sentence)
+            print("Old Sentence: " + sentence)
+            print("Changed sentence: " + sentences[i])
     censored_body = '. '.join(sentences)
     return censored_body
 
@@ -83,15 +91,18 @@ def censor_title_and_summary(article, good_class):
                     print("Strong Feelings: " + sentence)
                 except UnicodeEncodeError:
                     print("unicode shit")
-                summary_sents[i] = '<del>' + sentence + '</del>'
+                summary_sents[i] = helper.censor_text(sentence)
+                print("Old Sentence: " + sentence)
+                print("Changed sentence: " + summary_sents[i])
         #if not what we're aiming for
         elif cls != good_class and conf > .4:
             try:
                 print("Bad hombre:" + sentence)
             except UnicodeEncodeError:
                 print("unicode shit")
-            summary_sents[i] = '<del>' + sentence + '</del>'
-
+            summary_sents[i] = helper.censor_text(sentence)
+            print("Old Sentence: " + sentence)
+            print("Changed sentence: " + summary_sents[i])
     title_sents = censored.title.split('.')
     for i in range(len(title_sents)):
         sentence = title_sents[i]
@@ -110,15 +121,18 @@ def censor_title_and_summary(article, good_class):
                     print("Strong Feelings: " + sentence)
                 except UnicodeEncodeError:
                     print("unicode shit")
-                title_sents[i] = '<del>' + sentence + '</del>'
+                title_sents[i] = helper.censor_text(sentence)
+                print("Old Sentence: " + sentence)
+                print("Changed sentence: " + title_sents[i])
         #if not what we're aiming for
         elif cls != good_class and conf > .4:
             try:
                 print("Bad hombre:" + sentence)
             except UnicodeEncodeError:
                 print("unicode shit")
-            title_sents[i] = '<del>' + sentence + '</del>'
-
+            title_sents[i] = helper.censor_text(sentence)
+            print("Old Sentence: " + sentence)
+            print("Changed sentence: " + title_sents[i])
     censored_summary = '. '.join(summary_sents)
     censored.summary = censored_summary
     censored_title = '. '.join(title_sents)
