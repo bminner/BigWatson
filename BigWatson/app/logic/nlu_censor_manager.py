@@ -27,9 +27,9 @@ def censor_sentences(sentences, table, entities, good_class):
 
     censored_entities = []
     for e in entities:
-        if e.sentiment_score > 0 and good_class != POSSIBLE_CLASSES[0]:
+        if e.sentiment_score > .2 and good_class != POSSIBLE_CLASSES[0]:
             censored_entities.append(e)
-        elif e.sentiment_score < 0 and good_class != POSSIBLE_CLASSES[1]:
+        elif e.sentiment_score < -.2 and good_class != POSSIBLE_CLASSES[1]:
             censored_entities.append(e)
         elif e.sentiment_score == 0 and good_class not in POSSIBLE_CLASSES:
             #TODO Do something for neutral
@@ -39,8 +39,7 @@ def censor_sentences(sentences, table, entities, good_class):
         #locations = ce.mentions[0][1]
         locations = []
         print("Entity = " + ce.name)
-        print("Sentiment = " + ce.sentiment_score)
-        print("\nMentions = " + str(ce.mentions))
+        print("Added Sentiment = " + str(ce.sentiment_score))
         for mention in ce.mentions:
             if len(mention) > 1:
                 locations += mention[1]
@@ -48,15 +47,18 @@ def censor_sentences(sentences, table, entities, good_class):
         for i,location in enumerate(locations):
             if i % 2 == 0:
                 print(str(i))
-                sent, parent_index, relative_index = table.lookup(location)
-                print("Sentence = " + str(sent))
-                if sent in sentences:
-                    sent_index = sentences.index(sent)
-                #TODO Censor by specific word using Kurt's stuff
-                #censor_words(sentences[sent_index]) 
-                print("Sentences: " + str(sentences))
-                sentences[sent_index] = '<del>' + sent + '</del>'
-                print("Sentences post censor: " + str(sentences) + "\n")
+                try:
+                    sent, parent_index, relative_index = table.lookup(location)
+                    print("Sentence = " + str(sent))
+                    if sent in sentences:
+                        sent_index = sentences.index(sent)
+                    #TODO Censor by specific word using Kurt's stuff
+                    #censor_words(sentences[sent_index]) 
+                    print("Sentences: " + str(sentences))
+                    sentences[sent_index] = '<del>' + sent + '</del>'
+                    print("Sentences post censor: " + str(sentences) + "\n")
+                except AssertionError:
+                    print("Index out of bounds")
     
     return sentences
 
@@ -67,12 +69,14 @@ def censor_body(body, good_class):
     #sentences = nltk.sent_tokenize(body)
     print("BODY SENTENCES = " + str(sentences))
     table = SeqTable(sentences)
-    entity_generator = analyze(body)
+    entity_generator = []
+    if len(body) > 10:
+        entity_generator = analyze(body)
     entities = list(entity_generator)
 
     sentences = censor_sentences(sentences, table, entities, good_class)
 
-    return sentences
+    return '. '.join(sentences)
 
 def censor_title_and_summary(article, good_class):
 
@@ -82,7 +86,9 @@ def censor_title_and_summary(article, good_class):
     summary_sents = summary.split(".")
     #summary_sents = nltk.sent_tokenize(summary)
     summary_table = SeqTable(summary_sents)
-    entity_generator = analyze(summary)
+    entity_generator = []
+    if len(summary) > 10:
+        entity_generator = analyze(summary)
     summary_entities = list(entity_generator)
     summary_sents = censor_sentences(summary_sents, summary_table, summary_entities, good_class)
 
@@ -90,7 +96,8 @@ def censor_title_and_summary(article, good_class):
     title_sents = title.split(".")
     #title_sents = nltk.sent_tokenize(title)
     title_table = SeqTable(title_sents)
-    entity_generator = analyze(title)
+    if len(title) >0:
+        entity_generator = analyze(title)
     title_entities = list(entity_generator)
     title_sents = censor_sentences(title_sents, title_table, title_entities, good_class)
 

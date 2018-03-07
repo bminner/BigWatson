@@ -7,12 +7,9 @@ KeyError on 'mentions'
 	Example: Search "T
 
 WatsonApiException
-	"Not enough text provided for language detection, Code: 400"]
-	I have no idea what's breaking this
-	Example: Search "Donald Trump" with effect = positive
-
-In the returned article "ERROR: No article text found for result ID"
-	This must be a bad article
+	-"Not enough text provided for language detection, Code: 400"]
+	-This occurs when the returned page is empty or has very little words
+	-To take care of this we don't allow any body with less than 100 words.
 
 LookupError
 	unknown encoding: 'b'UTF-8;width=device-width''

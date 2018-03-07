@@ -18,7 +18,7 @@ def index(request):
     )
 
 
-@cache_page(60 * 15)
+#@cache_page(60 * 15)
 def results(request):
     query = request.GET.get('query', '')
     censorship = request.GET.get('censorship', '')
@@ -35,7 +35,10 @@ def results(request):
     except:
         raise
 
-    discovery_results = dm.query_discovery(query)
+    try:
+        discovery_results = dm.query_discovery(query)
+    except LookupError:
+        print("Unknown UTF Encoding")
     #censored_results = cm.censor_results(discovery_results, censorship_desc.lower())
     censored_results = nlu.censor_results(discovery_results, censorship_desc.lower())
 
@@ -54,7 +57,7 @@ def results(request):
     )
 
 
-@cache_page(60 * 15)
+#@cache_page(60 * 15)
 def result(request):
     result_bodies = request.session.get('results', '')
     censorship = request.session.get('censorship', '')
