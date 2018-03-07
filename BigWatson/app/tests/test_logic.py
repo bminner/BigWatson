@@ -129,7 +129,9 @@ class HelpersTest(TestCase):
         censored_text = helper.censor_text(text)
 
         self.assertEqual('the <strong>canine</strong> is a <strong>bad</strong> <strong>male</strong>', censored_text)
+    """
 
+    
 class NLUTest(TestCase):
     def test_censor_body(self):
         body = "Donald Trump is an idiot and awful president.Cats are cool and I like bunnies.North Korea is the worst country in the world."
