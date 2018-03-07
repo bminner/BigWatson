@@ -4,7 +4,10 @@ import logging
 from django.shortcuts import render
 from django.views.decorators.cache import cache_page
 from .logic import discovery_manager as dm
-from .logic import censor_manager as cm
+#from .logic import censor_manager as cm
+from .logic import nlu_censor_manager as nlu
+from django.views.decorators.cache import cache_page
+import logging
 
 
 def index(request):
@@ -13,7 +16,7 @@ def index(request):
     return render(request, 'index.html')
 
 
-@cache_page(60 * 15)
+#@cache_page(60 * 15)
 def results(request):
     """ results.html template """
 
@@ -32,8 +35,12 @@ def results(request):
     except:
         raise
 
-    discovery_results = dm.query_discovery(query)
-    censored_results = cm.censor_results(discovery_results, censorship_desc)
+    try:
+        discovery_results = dm.query_discovery(query)
+    except LookupError:
+        print("Unknown UTF Encoding")
+    #censored_results = cm.censor_results(discovery_results, censorship_desc.lower())
+    censored_results = nlu.censor_results(discovery_results, censorship_desc.lower())
 
     result_bodies = []
     for r in censored_results:
@@ -50,7 +57,7 @@ def results(request):
     )
 
 
-@cache_page(60 * 15)
+#@cache_page(60 * 15)
 def result(request):
     """ result.html template """
 
@@ -67,8 +74,9 @@ def result(request):
         logging.exception('Invalid result ID provided')
     except:
         raise
-
-    body = cm.censor_body(body, censorship)
+    
+    #body = cm.censor_body(body, censorship)
+    body = nlu.censor_body(body, censorship)
 
     return render(
         request,

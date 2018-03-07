@@ -1,0 +1,18 @@
+SSL error
+	This apparently happens since our site is http and we try to access a site that is https
+
+KeyError on 'mentions'
+	KeyError means that we try to access a dictionary with a key that does not exist
+	In constructor of Entity class
+	Example: Search "T
+
+WatsonApiException
+	-"Not enough text provided for language detection, Code: 400"]
+	-This occurs when the returned page is empty or has very little words
+	-To take care of this we don't allow any body with less than 100 words.
+
+LookupError
+	unknown encoding: 'b'UTF-8;width=device-width''
+	I don't know what's breaking this.
+	Example: Search "Clinton" with effect = positive
+

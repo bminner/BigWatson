@@ -4,6 +4,7 @@ from django.test import TestCase
 import json
 from nltk.corpus import wordnet as wn
 from ..logic.helpers import QueryHelper
+from ..logic.nlu_censor_manager import censor_body
 from ..logic.helpers import WordNetHelper
 
 
@@ -81,7 +82,7 @@ class HelpersTest(TestCase):
             self.assertEqual('body', result.body)
             self.assertEqual(suffix, result.sentiment_score)
             suffix += 1
-    
+
     def test_tag_text_tags_text(self):
         helper = self.create_mock_wordnet_helper()
         text = 'the cat wears a red hat'
@@ -129,6 +130,19 @@ class HelpersTest(TestCase):
 
         self.assertEqual('the <strong>canine</strong> is a <strong>bad</strong> <strong>male</strong>', censored_text)
     """
+
+    
+class NLUTest(TestCase):
+    def test_censor_body(self):
+        body = "Donald Trump is an idiot and awful president.Cats are cool and I like bunnies.North Korea is the worst country in the world."
+        good_class = 'positive'
+        results = censor_body(body, good_class)
+        print("First results = " + str(results))
+        censored_result = "<del>Donald Trump is an idiot and awful president</del>. Cats are cool and I like bunnies. <del>North Korea is the worst country in the world</del>. "
+
+        print("censored = " + str(censored_result))
+        print("results given = " + str(results))
+        self.assertEqual(censored_result,results)
 
 
 class MockExtractor():
