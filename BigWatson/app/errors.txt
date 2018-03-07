@@ -12,3 +12,10 @@ WatsonApiException
 	Example: Search "Donald Trump" with effect = positive
 
 In the returned article "ERROR: No article text found for result ID"
+	This must be a bad article
+
+LookupError
+	unknown encoding: 'b'UTF-8;width=device-width''
+	I don't know what's breaking this.
+	Example: Search "Clinton" with effect = positive
+
