@@ -55,7 +55,7 @@ class QueryHelper:
 
         # if no meta description, make summary first 200 characters of article body
         data['summary'] = summary if len(summary) > 0 else body[:200] + '...'
-        data['body'] = article.cleaned_text.replace('\n', '</p><p>')
+        data['body'] = body
 
         return data
 
@@ -79,9 +79,9 @@ class WordNetHelper:
         
         adjs_and_nouns = self.tag_text(text)
         modified_adjs = self.replace_adjectives_with_antonym(text, adjs_and_nouns['adjs'])
-        # modified_adjs_and_nouns = self.replace_nouns_with_hypernyms(modified_adjs, adjs_and_nouns['nouns'])
+        modified_adjs_and_nouns = self.replace_nouns_with_hypernyms(modified_adjs, adjs_and_nouns['nouns'])
 
-        return modified_adjs
+        return modified_adjs_and_nouns
 
     def tag_text(self, text):
         """ tags given text by POS and returns dictionary of adjectives and nouns for modification. """
