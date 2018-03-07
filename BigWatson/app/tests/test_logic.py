@@ -2,8 +2,10 @@ __author__ = 'Kurtis'
 
 from django.test import TestCase
 import json
+from nltk.corpus import wordnet as wn
 from ..logic.helpers import QueryHelper
 from ..logic.nlu_censor_manager import censor_body
+from ..logic.helpers import WordNetHelper
 
 
 class HelpersTest(TestCase):
@@ -13,6 +15,9 @@ class HelpersTest(TestCase):
         """ Creates mock extractor with given attributes """
         extractor = MockExtractor(meta_description, cleaned_text)
         return QueryHelper(extractor)
+
+    def create_mock_wordnet_helper(self, wordnet_client=wn):
+        return WordNetHelper(wordnet_client)
     
     def create_mock_results(self):
         """ Creates list of results in the format of a Discovery query result """
@@ -95,6 +100,50 @@ class NLUTest(TestCase):
         print("censored = " + str(censored_result))
         print("results given = " + str(results))
         self.assertEqual(censored_result,results)
+    def test_tag_text_tags_text(self):
+        helper = self.create_mock_wordnet_helper()
+        text = 'the cat wears a red hat'
+
+        adjs_and_nouns = helper.tag_text(text)
+        adjs = adjs_and_nouns['adjs']
+        nouns = adjs_and_nouns['nouns']
+
+        self.assertEqual(1, len(adjs))
+        self.assertEqual('red', adjs[0])
+        self.assertEqual(2, len(nouns))
+        self.assertEqual('cat', nouns[0])
+        self.assertEqual('hat', nouns[1])
+
+    def test_replace_adjective_with_antonym_replaces_adjective(self):
+        helper = self.create_mock_wordnet_helper()
+        positive_text = 'the dog is a good boy'
+        negative_text = 'the dog is a bad boy'
+        pos_adjective_seq = ['good']
+        neg_adjective_seq = ['bad']
+
+        edited_to_be_negative = helper.replace_adjectives_with_antonym(positive_text, pos_adjective_seq)
+        edited_to_be_positive = helper.replace_adjectives_with_antonym(negative_text, neg_adjective_seq)
+
+
+        self.assertEqual('the dog is a <strong>bad</strong> boy', edited_to_be_negative)
+        self.assertEqual('the dog is a <strong>good</strong> boy', edited_to_be_positive)
+
+    def test_replace_noun_with_hypernyms_replaces_noun(self):
+        helper = self.create_mock_wordnet_helper()
+        text = 'the dog is a good boy'
+        noun_seq = ['dog', 'boy']
+
+        edited_text = helper.replace_nouns_with_hypernyms(text, noun_seq)
+
+        self.assertEqual('the <strong>canine</strong> is a good <strong>male</strong>', edited_text)
+        
+    def test_censor_text_censors_adjectives_and_nouns(self):
+        helper = self.create_mock_wordnet_helper()
+        text = 'the dog is a good boy'
+
+        censored_text = helper.censor_text(text)
+
+        self.assertEqual('the <strong>canine</strong> is a <strong>bad</strong> <strong>male</strong>', censored_text)
 
 
 class MockExtractor():
