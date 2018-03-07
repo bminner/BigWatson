@@ -38,8 +38,12 @@ def censor_sentences(sentences, table, entities, good_class):
     for ce in censored_entities:
         #locations = ce.mentions[0][1]
         locations = []
+        print("Entity = " + ce.name)
+        print("Sentiment = " + ce.sentiment_score)
+        print("\nMentions = " + str(ce.mentions))
         for mention in ce.mentions:
-            locations += mention[1]
+            if len(mention) > 1:
+                locations += mention[1]
         print("Locations = " + str(locations))
         for i,location in enumerate(locations):
             if i % 2 == 0:

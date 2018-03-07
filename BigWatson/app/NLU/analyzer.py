@@ -1,6 +1,8 @@
 from watson_developer_cloud.natural_language_understanding_v1 import *
 from ..models import Article
 from watson_developer_cloud import NaturalLanguageUnderstandingV1
+import json
+
 
 def init_nlu_engine():
     url = "https://gateway.watsonplatform.net/natural-language-understanding/api",
@@ -22,10 +24,13 @@ def analyze(text):
             entities=EntitiesOptions(
                 sentiment=True,
                 mentions=True,
-                limit=100),
-            semantic_roles=SemanticRolesOptions(limit=100)
+                limit=10),
+            semantic_roles=SemanticRolesOptions(limit=10)
         )
     )
+
+    with open('data.txt', 'w') as outfile:
+        json.dump(response, outfile)
 
     return _parse_entities(response)
 

@@ -1,0 +1,14 @@
+SSL error
+	This apparently happens since our site is http and we try to access a site that is https
+
+KeyError on 'mentions'
+	KeyError means that we try to access a dictionary with a key that does not exist
+	In constructor of Entity class
+	Example: Search "T
+
+WatsonApiException
+	"Not enough text provided for language detection, Code: 400"]
+	I have no idea what's breaking this
+	Example: Search "Donald Trump" with effect = positive
+
+In the returned article "ERROR: No article text found for result ID"
