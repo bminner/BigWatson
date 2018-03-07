@@ -3,6 +3,24 @@ __author__ = 'Brandon'
 from ..NLU.seqtable import SeqTable
 from ..NLU.analyzer import analyze, Entity
 from ..models import Article
+import nltk
+
+# takes in discovery results in the form of an Article array from query_manager
+# returns array of censored Article objects
+def censor_results(discovery_results, good_class):
+    censored_articles = []
+
+    # call nlc analysis on each article
+    for article in discovery_results:
+
+        # for title, summary, and each body sentence
+        # TODO call nlc analysis on different c_article components
+
+        # add new article with changes
+        censored_article = censor_title_and_summary(article, good_class)
+        censored_articles.append(censored_article)
+
+    return censored_articles
 
 def censor_sentences(sentences, table, entities, good_class):
     POSSIBLE_CLASSES = ['positive', 'negative']
@@ -22,21 +40,28 @@ def censor_sentences(sentences, table, entities, good_class):
         locations = []
         for mention in ce.mentions:
             locations += mention[1]
-        for location in locations:
-            sent, parent_index, relative_index = table.lookup(location)
-            print("Index tuple = " + str(index_tuple))
-            print("Sentences = " + str(sentences))
-            sent_index = sentences.index(index_tuple[0])
-            #TODO Censor by specific word using Kurt's stuff
-            #censor_words(sentences[sent_index]) 
-            sentences[sent_index] = '<del>' + index_tuple[0] + '</del>'
+        print("Locations = " + str(locations))
+        for i,location in enumerate(locations):
+            if i % 2 == 0:
+                print(str(i))
+                sent, parent_index, relative_index = table.lookup(location)
+                print("Sentence = " + str(sent))
+                if sent in sentences:
+                    sent_index = sentences.index(sent)
+                #TODO Censor by specific word using Kurt's stuff
+                #censor_words(sentences[sent_index]) 
+                print("Sentences: " + str(sentences))
+                sentences[sent_index] = '<del>' + sent + '</del>'
+                print("Sentences post censor: " + str(sentences) + "\n")
     
     return sentences
 
 def censor_body(body, good_class):
 
+    print("Body original = " + body)
     sentences = body.split(".")
-    #sentences = sent_tokenize(body)
+    #sentences = nltk.sent_tokenize(body)
+    print("BODY SENTENCES = " + str(sentences))
     table = SeqTable(sentences)
     entity_generator = analyze(body)
     entities = list(entity_generator)
@@ -51,7 +76,7 @@ def censor_title_and_summary(article, good_class):
 
     summary = censored.summary
     summary_sents = summary.split(".")
-    #summary_sents = sent_tokenize(summary)
+    #summary_sents = nltk.sent_tokenize(summary)
     summary_table = SeqTable(summary_sents)
     entity_generator = analyze(summary)
     summary_entities = list(entity_generator)
@@ -59,7 +84,7 @@ def censor_title_and_summary(article, good_class):
 
     title = censored.title
     title_sents = title.split(".")
-    #title_sents = sent_tokenize(title)
+    #title_sents = nltk.sent_tokenize(title)
     title_table = SeqTable(title_sents)
     entity_generator = analyze(title)
     title_entities = list(entity_generator)
@@ -69,8 +94,3 @@ def censor_title_and_summary(article, good_class):
     censored.title = '. '.join(title_sents)
 
     return censored
-
-def __main__():
-    text = "The president is a ball gargling idiot."
-    good_class = 'positive'
-    censor_body(text,good_class)

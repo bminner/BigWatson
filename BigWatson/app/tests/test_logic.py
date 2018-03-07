@@ -80,15 +80,21 @@ class HelpersTest(TestCase):
     
 class NLUTest(TestCase):
     def test_censor_body(self):
-        body = "Donald Trump is an idiot and awful president.Cats are cool and I like bunnies.North Korea hates all things that are good."
+        body = "Donald Trump is an idiot and awful president.Cats are cool and I like bunnies.North Korea is the worst country in the world."
         good_class = 'positive'
-        result = censor_body(body, good_class)
-        print(result)
-        censored_result = "<del>Donald Trump is an idiot and awful president.</del>Cats are cool and I like bunnies.<del>North Korea hates all things that are good.</del>"
-        self.assertEqual(censored_result,result)
+        results = censor_body(body, good_class)
+        print(results)
+        censored_result = ["<del>Donald Trump is an idiot and awful president</del>","Cats are cool and I like bunnies","<del>North Korea is the worst country in the world</del>"]
+        temp = []
+        for result in results:
+            if result != "":
+                temp.append(result)
+        results = temp
 
 
-
+        print("censored = " + str(censored_result))
+        print("results given = " + str(results))
+        self.assertEqual(censored_result,results)
 
 
 class MockExtractor():

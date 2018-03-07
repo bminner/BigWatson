@@ -2,7 +2,8 @@ __author__ = 'Kurtis'
 
 from django.shortcuts import render
 from .logic import discovery_manager as dm
-from .logic import censor_manager as cm
+#from .logic import censor_manager as cm
+from .logic import nlu_censor_manager as nlu
 from django.views.decorators.cache import cache_page
 import logging
 
@@ -35,7 +36,8 @@ def results(request):
         raise
 
     discovery_results = dm.query_discovery(query)
-    censored_results = cm.censor_results(discovery_results, censorship_desc.lower())
+    #censored_results = cm.censor_results(discovery_results, censorship_desc.lower())
+    censored_results = nlu.censor_results(discovery_results, censorship_desc.lower())
 
     result_bodies = []
     for r in censored_results:
@@ -68,7 +70,8 @@ def result(request):
     except:
         raise
     
-    body = cm.censor_body(body, censorship)
+    #body = cm.censor_body(body, censorship)
+    body = nlu.censor_body(body, censorship)
 
     return render(
         request,
