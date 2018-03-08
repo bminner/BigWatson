@@ -40,11 +40,8 @@ def censor_sentences(sentences, table, entities, good_class):
         print("Locations = " + str(locations))
         for i,location in enumerate(locations):
             if i % 2 == 0:
-                try:
-                    sent, parent_index, relative_index = table.lookup(location)
-                    sent_locations.append(parent_index)
-                except AssertionError:
-                    print("Bad code")
+                sent, parent_index, relative_index = table.lookup(location)
+                sent_locations.append(parent_index)
         god_tuple = (en, sent_locations)
         ent_sent.append(god_tuple)
 
@@ -58,7 +55,7 @@ def censor_sentences(sentences, table, entities, good_class):
         for s in t[1]:
             sentiment_sum[s] += t[0].sentiment_score
 
-        
+
     print("god array = " + str(sentiment_sum))
 
     for i,score in enumerate(sentiment_sum):
@@ -70,7 +67,7 @@ def censor_sentences(sentences, table, entities, good_class):
         elif score == 0 and good_class not in POSSIBLE_CLASSES:
             #TODO Do something for neutral
             sentences[i] = censored_text
-            
+
     """
     censored_entities = []
     for e in entities:
@@ -111,32 +108,32 @@ def censor_sentences(sentences, table, entities, good_class):
     """
 
 
-    
+
     return sentences
 
 def censor_body(body, good_class):
-
-    print("Body original = " + body)
-    sentences = body.split(".")
-    #sentences = nltk.sent_tokenize(body)
-    print("BODY SENTENCES = " + str(sentences))
+    body_stripped = body.strip().replace('\n', '')
+    print('Body (stripped): {0}'.format(body_stripped))
+    #sentences = body.split(".")
+    sentences = nltk.sent_tokenize(body_stripped)
+    print('Tokenized: {0}'.format(sentences))
     table = SeqTable(sentences)
     entity_generator = []
     if len(body) > 100:
-        entity_generator = analyze(body)
+        entity_generator = analyze('.'.join(sentences))
     entities = list(entity_generator)
 
     sentences = censor_sentences(sentences, table, entities, good_class)
 
-    return '. '.join(sentences).replace('\n', '</p><p>')
+    return '. '.join(sentences) #.replace('\n', '</p><p>')
 
 def censor_title_and_summary(article, good_class):
 
     censored = Article.Article.from_article(article)
 
     summary = censored.summary
-    summary_sents = summary.split(".")
-    #summary_sents = nltk.sent_tokenize(summary)
+    #summary_sents = summary.split(".")
+    summary_sents = nltk.sent_tokenize(summary)
     summary_table = SeqTable(summary_sents)
     entity_generator = []
     if len(summary) > 75:
@@ -145,8 +142,8 @@ def censor_title_and_summary(article, good_class):
     summary_sents = censor_sentences(summary_sents, summary_table, summary_entities, good_class)
 
     title = censored.title
-    title_sents = title.split(".")
-    #title_sents = nltk.sent_tokenize(title)
+    #title_sents = title.split(".")
+    title_sents = nltk.sent_tokenize(title)
     title_table = SeqTable(title_sents)
     if len(title) > 50:
         entity_generator = analyze(title)
