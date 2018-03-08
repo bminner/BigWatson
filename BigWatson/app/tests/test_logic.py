@@ -131,10 +131,10 @@ class HelpersTest(TestCase):
         self.assertEqual('the <strong>canine</strong> is a <strong>bad</strong> <strong>male</strong>', censored_text)
     """
 
-    
+"""  
 class NLUTest(TestCase):
     def test_censor_body(self):
-        body = "Donald Trump is an idiot and awful president.Cats are cool and I like bunnies.North Korea is the worst country in the world."
+        body = "Tom Brady is amazing.Donald Trump is an idiot and awful president and Tom Brady is my hero.North Korea is the worst country in the world."
         good_class = 'positive'
         results = censor_body(body, good_class)
         print("First results = " + str(results))
@@ -142,7 +142,7 @@ class NLUTest(TestCase):
 
         print("censored = " + str(censored_result))
         print("results given = " + str(results))
-        self.assertEqual(censored_result,results)
+        self.assertEqual(censored_result,results)"""
 
 
 class MockExtractor():
@@ -154,4 +154,5 @@ class MockExtractor():
     
     def extract(self, url):
         return self
+
  

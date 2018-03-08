@@ -26,7 +26,7 @@ def analyze(text):
             entities=EntitiesOptions(
                 sentiment=True,
                 mentions=True,
-                limit=5),
+                limit=20),
             semantic_roles=SemanticRolesOptions(limit=10)
         )
     )

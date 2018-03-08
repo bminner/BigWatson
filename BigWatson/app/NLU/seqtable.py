@@ -21,12 +21,12 @@ class SeqTable:
             assert index < self.total_len
         return self._lookup(index, self.seqs)
 
-    def _lookup(self, index, seqs):
+    def _lookup(self, index, seqs, offs=0):
         mid = int(len(seqs) / 2)
         seq, tlen = seqs[mid]
         if index < tlen:
             return self._lookup(index, seqs[:mid])
         elif index >= tlen + len(seq):
-            return self._lookup(index, seqs[mid:])
+            return self._lookup(index, seqs[mid:], offs + mid)
         else:
-            return seq, mid, index - tlen
+            return seq, mid + offs, index - tlen
