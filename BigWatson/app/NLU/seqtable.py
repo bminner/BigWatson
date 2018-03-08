@@ -13,12 +13,8 @@ class SeqTable:
             index of s in the parent sequence, and the relative location of
             'index' in s (index - start of s).
         """
-        if index < 0:
-            print("Index = " + index)
-            assert index >= 0
-        if index >= self.total_len:
-            print("Index " + str(index) + " < Total Length " + str(self.total_len))
-            assert index < self.total_len
+        assert index >= 0
+        assert index < self.total_len
         return self._lookup(index, self.seqs)
 
     def _lookup(self, index, seqs, offs=0):
