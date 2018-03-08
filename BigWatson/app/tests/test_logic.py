@@ -1,5 +1,6 @@
 __author__ = 'Kurtis'
 
+import asyncio
 from django.test import TestCase
 import json
 from nltk.corpus import wordnet as wn
@@ -40,17 +41,33 @@ class HelpersTest(TestCase):
             
     def test_get_article_data(self):
         helper = self.create_mock_query_helper()
-        data = helper.get_article_data(url='')
 
-        self.assertEqual('summary', data['summary'])
-        self.assertEqual('body', data['body'])
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        futures = [helper.coro_get_article_data('', 0)]
+        loop_result = loop.run_until_complete(asyncio.wait(futures))
+        tasks = loop_result[0]
+        task_results = [task.result() for task in tasks]
+        task_results.sort()
+        loop.close()
+
+        self.assertEqual('summary', task_results[0][1]['summary'])
+        self.assertEqual('body', task_results[0][1]['body'])
     
     def test_get_article_data_no_meta_description_returns_body(self):
         helper = self.create_mock_query_helper(meta_description='')
-        data = helper.get_article_data('')
 
-        self.assertEqual('body...', data['summary'])
-        self.assertEqual('body', data['body'])
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        futures = [helper.coro_get_article_data('', 0)]
+        loop_result = loop.run_until_complete(asyncio.wait(futures))
+        tasks = loop_result[0]
+        task_results = [task.result() for task in tasks]
+        task_results.sort()
+        loop.close()
+
+        self.assertEqual('body...', task_results[0][1]['summary'])
+        self.assertEqual('body', task_results[0][1]['body'])
 
     def test_get_article_data_truncates_body_as_meta_description(self):
         long_string = ''
@@ -59,12 +76,20 @@ class HelpersTest(TestCase):
         truncated_string = long_string[:200] + '...'
 
         helper = self.create_mock_query_helper(meta_description='', cleaned_text=long_string)
-        data = helper.get_article_data('')
+
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        futures = [helper.coro_get_article_data('', 0)]
+        loop_result = loop.run_until_complete(asyncio.wait(futures))
+        tasks = loop_result[0]
+        task_results = [task.result() for task in tasks]
+        task_results.sort()
+        loop.close()
 
         self.assertEqual(300, len(long_string))
         self.assertEqual(203, len(truncated_string))
-        self.assertEqual(truncated_string, data['summary'])
-        self.assertEqual(long_string, data['body'])
+        self.assertEqual(truncated_string, task_results[0][1]['summary'])
+        self.assertEqual(long_string, task_results[0][1]['body'])
     
     def test_parse_discovery_results(self):
         results = self.create_mock_results()
