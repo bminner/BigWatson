@@ -8,6 +8,7 @@ nltk_path.append(dir_path + '/nltk_data')
 from nltk.corpus import wordnet as wn
 from nltk.tag import pos_tag
 from nltk.tokenize import word_tokenize
+import asyncio
 
 
 class QueryHelper:
@@ -24,23 +25,34 @@ class QueryHelper:
         Parses results received from querying Watson Discovery.
         Returns list of Articles parsed from json results.
         """
-        
+
+        #async get article data
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        futures = [self.coro_get_article_data(results[i]['url'], i) for i in range(len(results))]
+        loop_result = loop.run_until_complete(asyncio.wait(futures))
+        tasks = loop_result[0]
+        task_results = [task.result() for task in tasks]
+        task_results.sort()
+        loop.close()
+
+        #create article objects with data
         discovery_results = []
-        for result in results:
-            title = result['title']
-            url = result['url']
+        for i in range(len(results)):
+            title = results[i]['title']
+            url = results[i]['url']
             
-            article_data = self.get_article_data(url)
+            article_data = task_results[i][1]
 
             summary = article_data['summary']
             body = article_data['body']
-            sentiment_score = result['enriched_text']['sentiment']['document']['score']
+            sentiment_score = results[i]['enriched_text']['sentiment']['document']['score']
 
             discovery_results.append(Article(title, url, summary, body, sentiment_score))
 
         return discovery_results
 
-    def get_article_data(self, url):
+    async def coro_get_article_data(self, url, ind):
         """
         Extracts article data from provided url. Default extractor is Goose object.
         Returns dictionary of strings with keys summary and body.
@@ -57,7 +69,7 @@ class QueryHelper:
         data['summary'] = summary if len(summary) > 0 else body[:200] + '...'
         data['body'] = body
 
-        return data
+        return ind, data
 
 
 class WordNetHelper:
