@@ -17,6 +17,8 @@ def init_nlu_engine():
 nlu = init_nlu_engine()
 
 def analyze(text):
+    response = {}
+    #try:
     """Analyzes the given text and returns a generator of Entity objects."""
     response = nlu.analyze(
         text=text,
@@ -28,18 +30,26 @@ def analyze(text):
             semantic_roles=SemanticRolesOptions(limit=10)
         )
     )
+    #except Exception:
+    #    print("\n\nProbably not enough text for language exception\n\n")
+
+    with open('data.txt', 'w') as outfile:
+        json.dump(response, outfile)
 
     return _parse_entities(response)
 
 
 def _parse_entities(response):
-    entities = response['entities'] if 'entities' in response else []
+    #try:
+    entities = response['entities']
     for e in entities:
         name = e['text']
         ttype = e['type']
         score = e['sentiment']['score']
-        mentions = [(m['text'], m['location']) for m in e['mentions']] if 'mentions' in e else []
+        mentions = [(m['text'], m['location']) for m in e['mentions']]
         yield Entity(name, ttype, score, mentions)
+    #except KeyError:
+    print("/n/nThere is apparently no entity of mentions in this article.")
 
 
 class Entity:
