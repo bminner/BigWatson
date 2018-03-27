@@ -61,7 +61,9 @@ def _parse_mention(m, word_lookup_func):
 
 class AnalyzeResult:
     def __init__(self, title_entities, summary_entities, body_entitites):
-
+        self.title_entities = title_entities
+        self.summary_entities = summary_entities
+        self.body_entitites = body_entitites
 
 class Entity:
     def __init__(self, name, ttype, sentiment_score, mentions):
