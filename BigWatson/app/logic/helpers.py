@@ -104,8 +104,8 @@ class WordNetHelper:
         for wordtag in tagged_text:
             if wordtag[1] == 'JJ':
                 adjs_and_nouns['adjs'].append(wordtag[0])
-            elif wordtag[1] == 'NN' or wordtag[1] == 'NNS':
-                adjs_and_nouns['nouns'].append(wordtag[0])
+            elif len(wordtag[0]) > 2 and (wordtag[1] == 'NN' or wordtag[1] == 'NNS'):
+                    adjs_and_nouns['nouns'].append(wordtag[0])
         
         return adjs_and_nouns
 
