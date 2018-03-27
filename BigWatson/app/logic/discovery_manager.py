@@ -15,6 +15,23 @@ discovery = DiscoveryV1(
     version="2017-11-07"
 )
 
+def query_discovery_count(query, num):
+    """ Returns a list of Articles by querying the Discovery service """
+
+    discovery_query = discovery.query(environment_id=DISC_ENVIRONMENT_ID,
+                                     collection_id=DISC_COLLECTION_ID,
+                                     natural_language_query=query,
+                                     return_fields=['title', 'url', 'enriched_text.sentiment.document.score'],
+                                     count=num)
+
+    # build QueryHelper with Goose extractor
+    goose_extractor = Goose({'strict':False})
+    qh = QueryHelper(goose_extractor)
+
+    discovery_results = qh.parse_discovery_results(discovery_query['results'])
+
+    return discovery_results
+
 
 def query_discovery(query):
     """ Returns a list of Articles by querying the Discovery service """
