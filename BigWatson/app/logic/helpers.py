@@ -113,8 +113,10 @@ class WordNetHelper:
         """ Replaces adjectives in given text with antonyms. """
 
         antonyms = []
+        prefix = '<div class=\"tooltip\">'
 
         for adj in adjective_seq:
+            suffix = '<span class=\"tooltiptext\">' + adj + '</span></div>'
             syns = self.wordnet_client.synsets(adj, pos=['a','s'])
             antonym = '<del>' + adj + '</del>'
             
@@ -122,7 +124,7 @@ class WordNetHelper:
                 for s in syns:
                     for l in s.lemmas():
                         if l.antonyms():
-                            antonym = '<strong>' + l.antonyms()[0].name() + '</strong>'
+                            antonym = prefix + '<strong>' + l.antonyms()[0].name() + '</strong>' + suffix
                             raise AntonymFound
             except:
                 pass
@@ -138,14 +140,16 @@ class WordNetHelper:
         """ Replaces nouns in text with hypernyms (more generic versions). """
 
         hypernyms = []
+        prefix = '<div class=\"tooltip\">'
 
         for noun in noun_seq:
+            suffix = '<span class=\"tooltiptext\">' + noun + '</span></div>'
             syns = self.wordnet_client.synsets(noun, pos=['n'])
             hypernym = '<del>' + noun + '</del>'
 
             for s in syns:
                 if s.hypernyms():
-                    hypernym = '<strong>' + s.hypernyms()[0].name().split('.')[0] + '</strong>'
+                    hypernym = prefix + '<strong>' + s.hypernyms()[0].name().split('.')[0] + '</strong>' + suffix
                     hypernym = hypernym.replace('_', ' ')
                     break
             
