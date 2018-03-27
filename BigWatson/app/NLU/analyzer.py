@@ -18,6 +18,9 @@ nlu = init_nlu_engine()
 
 def analyze(text):
     response = {}
+
+    text = 'Donald Trump is an idiot. He is the president'
+
     #try:
     """Analyzes the given text and returns a generator of Entity objects."""
     response = nlu.analyze(
@@ -27,7 +30,7 @@ def analyze(text):
                 sentiment=True,
                 mentions=True,
                 limit=20),
-            semantic_roles=SemanticRolesOptions(limit=10)
+            semantic_roles=SemanticRolesOptions(limit=10, entities=True, keywords=True)
         )
     )
     #except Exception:
@@ -40,16 +43,24 @@ def analyze(text):
 
 
 def _parse_entities(response):
-    #try:
-    entities = response['entities']
-    for e in entities:
-        name = e['text']
-        ttype = e['type']
-        score = e['sentiment']['score']
-        mentions = [(m['text'], m['location']) for m in e['mentions']]
-        yield Entity(name, ttype, score, mentions)
-    #except KeyError:
-    print("/n/nThere is apparently no entity of mentions in this article.")
+
+    with open('log.txt', 'w') as outfile:
+
+        #try:
+        s_roles = response['semantic_roles']
+        for s in s_roles:
+            pass
+
+        entities = response['entities']
+        for e in entities:
+            name = e['text']
+            ttype = e['type']
+            score = e['sentiment']['score']
+            mentions = [(m['text'], m['location']) for m in e['mentions']]
+            print(Entity(name, ttype, score, mentions))
+            yield Entity(name, ttype, score, mentions)
+
+        #except KeyError:
 
 
 class Entity:
