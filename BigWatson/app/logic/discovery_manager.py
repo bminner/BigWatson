@@ -23,7 +23,8 @@ def query_discovery(query):
                                      collection_id=DISC_COLLECTION_ID,
                                      natural_language_query=query,
                                      return_fields=['title', 'url', 'enriched_text.sentiment.document.score'],
-                                     count=5)
+                                     #count=5)
+                                      count=1)
 
     # build QueryHelper with Goose extractor
     goose_extractor = Goose({'strict':False})

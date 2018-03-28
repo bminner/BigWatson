@@ -36,21 +36,22 @@ def censor_sentences(sentences, table, entities, good_class):
         for mention in en.mentions:
             if len(mention) > 1:
                 locations += mention[1]
-        print("-------------------------------------")
-        print("Locations = " + str(locations))
+        #print("-------------------------------------")
+        #print("Locations = " + str(locations))
         for i,location in enumerate(locations):
             if i % 2 == 0:
                 try:
                     sent, parent_index, relative_index = table.lookup(location)
                     sent_locations.append(parent_index)
                 except AssertionError:
-                    print("Bad code")
+                    #print("Bad code")
+                    pass
         god_tuple = (en, sent_locations)
         ent_sent.append(god_tuple)
 
-    print("-----------------------------------------")
-    print("Ent_sent = " + str(ent_sent))
-    print("-----------------------------------------")
+    #print("-----------------------------------------")
+    #print("Ent_sent = " + str(ent_sent))
+    #print("-----------------------------------------")
 
     sentiment_sum = [0]*len(sentences)
 
@@ -59,7 +60,7 @@ def censor_sentences(sentences, table, entities, good_class):
             sentiment_sum[s] += t[0].sentiment_score
 
         
-    print("god array = " + str(sentiment_sum))
+    #print("god array = " + str(sentiment_sum))
 
     for i,score in enumerate(sentiment_sum):
         censored_text = helper.censor_text(sentences[i])

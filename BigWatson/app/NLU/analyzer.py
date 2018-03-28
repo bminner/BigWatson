@@ -19,7 +19,7 @@ nlu = init_nlu_engine()
 def analyze(text):
     response = {}
 
-    text = 'Donald Trump is an idiot. He is the president'
+    text = 'Donald Trump is an idiot. He is the president. North Korea is great. Donald Trump is the best person.'
 
     #try:
     """Analyzes the given text and returns a generator of Entity objects."""
@@ -36,40 +36,43 @@ def analyze(text):
     #except Exception:
     #    print("\n\nProbably not enough text for language exception\n\n")
 
-    with open('data.txt', 'w') as outfile:
-        json.dump(response, outfile)
-
     return _parse_entities(response)
 
 
 def _parse_entities(response):
 
-    with open('log.txt', 'w') as outfile:
+    print(json.dumps(response, sort_keys=True, indent=4))
 
-        #try:
-        s_roles = response['semantic_roles']
-        for s in s_roles:
-            pass
+    for e in response['entities']:
+        name = e['text']
+        ttype = e['type']
+        score = e['sentiment']['score']
+        mentions = [(m['text'], m['location']) for m in e['mentions']]
+        mention_index = 0
+        phrases = []
 
-        entities = response['entities']
-        for e in entities:
-            name = e['text']
-            ttype = e['type']
-            score = e['sentiment']['score']
-            mentions = [(m['text'], m['location']) for m in e['mentions']]
-            print(Entity(name, ttype, score, mentions))
-            yield Entity(name, ttype, score, mentions)
+        for s in response['semantic_roles']:
+            if s['subject']['entities'][0]['text'] == name:
+                while mentions[mention_index][0] != s['subject']['text']:
+                    mentions.pop(mention_index)
+                phrases.append(s['object']['text'])
+                mention_index += 1
 
-        #except KeyError:
+        mentions = mentions[0:mention_index]
+
+        print(Entity(name, ttype, score, mentions, phrases))
+
+        yield Entity(name, ttype, score, mentions, phrases)
 
 
 class Entity:
-    def __init__(self, name, ttype, sentiment_score, mentions):
+    def __init__(self, name, ttype, sentiment_score, mentions, phrases):
         self.name = name
         self.type = ttype
         self.sentiment_score = sentiment_score
         self.mentions = mentions
+        self.phrases = phrases
 
     def __repr__(self):
-        return 'Name: {0} | Type: {1} | Sentiment: {2} | Mentions: {3}'.format(
-            self.name, self.type, self.sentiment_score, self.mentions)
+        return 'Name: {0} | Type: {1} | Sentiment: {2} | Mentions: {3} | Phrases: {4}'.format(
+            self.name, self.type, self.sentiment_score, self.mentions, self.phrases)
