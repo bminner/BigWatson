@@ -19,7 +19,7 @@ nlu = init_nlu_engine()
 def analyze(text):
     response = {}
 
-    text = 'Donald Trump is an idiot. He is the president. North Korea is great. Donald Trump is the best person.'
+    text = 'The Ohio State University is  a great place to go to school. The Buckeyes have a great football team led by Urban Meyer. He is a good coach.'
 
     #try:
     """Analyzes the given text and returns a generator of Entity objects."""
@@ -30,7 +30,7 @@ def analyze(text):
                 sentiment=True,
                 mentions=True,
                 limit=20),
-            semantic_roles=SemanticRolesOptions(limit=10, entities=True, keywords=True)
+            semantic_roles=SemanticRolesOptions(limit=100, entities=True, keywords=True)
         )
     )
     #except Exception:
@@ -41,24 +41,31 @@ def analyze(text):
 
 def _parse_entities(response):
 
-    print(json.dumps(response, sort_keys=True, indent=4))
-
+    # print(json.dumps(response, sort_keys=True, indent=4))
+    # print(response['entities'])
     for e in response['entities']:
         name = e['text']
         ttype = e['type']
         score = e['sentiment']['score']
-        mentions = [(m['text'], m['location']) for m in e['mentions']]
+        mentions = [(m['text'], m['location'], False) for m in e['mentions']]
         mention_index = 0
         phrases = []
 
         for s in response['semantic_roles']:
-            if s['subject']['entities'][0]['text'] == name:
-                while mentions[mention_index][0] != s['subject']['text']:
-                    mentions.pop(mention_index)
-                phrases.append(s['object']['text'])
-                mention_index += 1
+            #print('\n\n')
+            #print(name)
+            #print(json.dumps(s, sort_keys=True, indent=4))
+            #print('\n\n')
+            if 'entities' in s['subject'] and s['subject']['entities'][0]['text'] == name:
+                #print('\n\nHERE\n\n')
+                #print(mentions[mention_index])
+                #print(s['subject']['text'])
+                if mentions[mention_index][0] in s['subject']['text']:
+                    mentions[mention_index] = (mentions[mention_index][0], mentions[mention_index][1], True)
+                    phrases.append(s['object']['text'])
+                    mention_index += 1
 
-        mentions = mentions[0:mention_index]
+        mentions = list(filter(lambda mention: mention[2], mentions))
 
         print(Entity(name, ttype, score, mentions, phrases))
 
