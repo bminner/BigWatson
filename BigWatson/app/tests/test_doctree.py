@@ -10,10 +10,10 @@ class DocTreeTest(TestCase):
             summary='Test summary',
             body='Do not go gentle into that good night. Rage, rage against the dying of the light.')
         doctree = DocTree(article)
-        title_node = doctree.title_node
+        title_nodes = doctree.title_nodes
         summary_nodes = doctree.summary_nodes
         body_nodes = doctree.body_nodes
-        self.assertEqual(title_node.get_text(), 'Test title')
+        self.assertEqual(title_nodes[0].get_text(), 'Test title')
         self.assertEqual(summary_nodes[0].get_text(), 'Test summary')
         self.assertEqual(summary_nodes[0].word_nodes[0].text, 'Test')
         self.assertEqual(summary_nodes[0].word_nodes[1].text, 'summary')

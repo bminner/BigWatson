@@ -116,7 +116,7 @@ class DocTree:
         self.original_title = article.title
         self.original_summary = article.summary
         self.original_body = article.body
-        self.title_node = SentenceNode(article.title, LinkedIndex(0))
+        self.title_nodes = self._sent_tokenize(self.original_title)
         self.summary_nodes = self._sent_tokenize(self.original_summary)
         self.body_nodes = self._sent_tokenize(self.original_body)
 
@@ -127,6 +127,11 @@ class DocTree:
 
     def summary_sentence_at(self, index):
         """Returns the summary sentence at the given document index."""
+
+        return _binary_search_nodes(index, self.summary_nodes)
+
+    def title_sentence_at(self, index):
+        """Returns the title sentence at the given document index."""
 
         return _binary_search_nodes(index, self.summary_nodes)
 
@@ -143,7 +148,10 @@ class DocTree:
         return sentence.word_at(index)
 
     def title_word_at(self, index):
-        return self.title_node.word_at(index)
+        sentence = self.title_sentence_at(index)
+        if sentence is None:
+            return None
+        return sentence.word_at(index)
 
     def get_body(self):
         return ''.join([s.leading_whitespace + s.get_text() for s in self.body_nodes])
@@ -152,7 +160,7 @@ class DocTree:
         return ''.join([s.leading_whitespace + s.get_text() for s in self.summary_nodes])
 
     def get_title(self):
-        return self.title_node.get_text()
+        return ''.join([s.leading_whitespace + s.get_text() for s in self.title_nodes])
 
     def _sent_tokenize(self, raw_text):
         raw_index = 0
