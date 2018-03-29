@@ -21,7 +21,7 @@ queries = ["donald trump", "north korea", "puppies", "snakes", "france"]
 
 for query in queries:
     print(query)
-    results = discovery_manager.query_discovery_count(query, 10)
+    results = discovery_manager.query_discovery(query, 10)
 
     filenames = []
     for result in results:
