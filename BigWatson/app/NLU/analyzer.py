@@ -16,10 +16,10 @@ def init_nlu_engine():
 
 nlu = init_nlu_engine()
 
-def analyze(text):
+def analyze(text, location):
     response = {}
 
-    text = 'The Ohio State University is  a great place to go to school. The Buckeyes have a great football team led by Urban Meyer. He is a good coach.'
+    print('\nEntities in {}\n'.format(location))
 
     #try:
     """Analyzes the given text and returns a generator of Entity objects."""
@@ -42,34 +42,46 @@ def analyze(text):
 def _parse_entities(response):
 
     # print(json.dumps(response, sort_keys=True, indent=4))
-    # print(response['entities'])
-    for e in response['entities']:
-        name = e['text']
-        ttype = e['type']
-        score = e['sentiment']['score']
-        mentions = [(m['text'], m['location'], False) for m in e['mentions']]
-        mention_index = 0
-        phrases = []
 
-        for s in response['semantic_roles']:
-            #print('\n\n')
-            #print(name)
-            #print(json.dumps(s, sort_keys=True, indent=4))
-            #print('\n\n')
-            if 'entities' in s['subject'] and s['subject']['entities'][0]['text'] == name:
-                #print('\n\nHERE\n\n')
-                #print(mentions[mention_index])
-                #print(s['subject']['text'])
-                if mentions[mention_index][0] in s['subject']['text']:
-                    mentions[mention_index] = (mentions[mention_index][0], mentions[mention_index][1], True)
-                    phrases.append(s['object']['text'])
-                    mention_index += 1
+    if 'entities' in response:
 
-        mentions = list(filter(lambda mention: mention[2], mentions))
+        # for each entity found
+        for e in response['entities']:
 
-        print(Entity(name, ttype, score, mentions, phrases))
+            # extract info
+            name = e['text']
+            ttype = e['type']
+            score = e['sentiment']['score']
 
-        yield Entity(name, ttype, score, mentions, phrases)
+            # optional mentions (sometimes none)
+            if 'mentions' in e:
+                mentions = [(m['text'], m['location'], False) for m in e['mentions']]
+
+            # initialize stuff for phrases
+            mention_index = 0
+            phrases = []
+
+            # for each sentence in semantic_roles array
+            for s in response['semantic_roles']:
+
+                # if sentence has subject entities and it is the entity we want
+                # OR if sentence has object entities and it is the entity we want
+                if ('entities' in s['subject'] and len(s['subject']['entities']) > 0 and s['subject']['entities'][0]['text'] == name) \
+                        or ('entities' in s['object'] and len(s['object']['entities']) > 0 and s['object']['entities'][0]['text'] == name):
+
+                    # if valid mentions for that entity are available and mention text is found in subject or object
+                    if mention_index < len(mentions) and (mentions[mention_index][0] in s['subject']['text'] or mentions[mention_index][0] in s['object']['text']):
+                        mentions[mention_index] = (mentions[mention_index][0], mentions[mention_index][1], True)
+                        phrases.append(s['object']['text'])
+                        mention_index += 1
+
+            # clear mentions that had no corresponding phrase
+            mentions = list(filter(lambda mention: mention[2], mentions))
+
+            # log Entity
+            print(Entity(name, ttype, score, mentions, phrases))
+
+            yield Entity(name, ttype, score, mentions, phrases)
 
 
 class Entity:
