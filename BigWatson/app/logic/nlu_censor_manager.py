@@ -124,7 +124,7 @@ def censor_body(body, good_class):
     table = SeqTable(sentences)
     entity_generator = []
     if len(body) > 100:
-        entity_generator = analyze(body, 'body')
+        entity_generator = analyze(body)
     entities = list(entity_generator)
 
     sentences = censor_sentences(sentences, table, entities, good_class)
@@ -141,7 +141,7 @@ def censor_title_and_summary(article, good_class):
     summary_table = SeqTable(summary_sents)
     entity_generator = []
     if len(summary) > 75:
-        entity_generator = analyze(summary, 'summary')
+        entity_generator = analyze(summary)
     summary_entities = list(entity_generator)
     summary_sents = censor_sentences(summary_sents, summary_table, summary_entities, good_class)
 
@@ -150,7 +150,7 @@ def censor_title_and_summary(article, good_class):
     #title_sents = nltk.sent_tokenize(title)
     title_table = SeqTable(title_sents)
     # if len(title) > 50:
-    entity_generator = analyze(title, 'title')
+    entity_generator = analyze(title)
     title_entities = list(entity_generator)
     title_sents = censor_sentences(title_sents, title_table, title_entities, good_class)
 

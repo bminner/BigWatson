@@ -43,7 +43,7 @@ def _query_nlu(text):
         )
     )
 
-def _parse_entities(response):
+def _parse_entities(response, word_lookup_func):
 
     # print(json.dumps(response, sort_keys=True, indent=4))
 
@@ -59,7 +59,7 @@ def _parse_entities(response):
 
             # optional mentions (sometimes none)
             if 'mentions' in e:
-                mentions = [(m['text'], m['location'], False) for m in e['mentions']]
+                mentions = [_parse_mention(m, word_lookup_func) for m in e['mentions']] if 'mentions' in e else []
 
             # initialize stuff for phrases
             mention_index = 0
@@ -92,7 +92,7 @@ def _parse_mention(m, word_lookup_func):
     location = m['location']
     word = word_lookup_func(location[0])
     assert(word is not None) # This should not happen; implies that NLU gave us a bad location value
-    return (text, word)
+    return (text, word, False)
 
 class AnalyzeResult:
     def __init__(self, title_entities, summary_entities, body_entitites):
