@@ -39,7 +39,6 @@ def results(request):
         discovery_results = dm.query_discovery(query)
     except LookupError:
         print("Unknown UTF Encoding")
-    #censored_results = cm.censor_results(discovery_results, censorship_desc.lower())
     censored_results = nlu.censor_results(discovery_results, censorship_desc.lower())
 
     result_bodies = []
