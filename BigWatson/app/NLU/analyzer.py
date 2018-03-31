@@ -1,8 +1,10 @@
 from watson_developer_cloud.natural_language_understanding_v1 import *
 from ..models import Article
+from ..logic.doctree import DocTree, LinkedIndex
 from watson_developer_cloud import NaturalLanguageUnderstandingV1
 import json
 
+MIN_TEXT_LENGTH = 50
 
 def init_nlu_engine():
     url = "https://gateway.watsonplatform.net/natural-language-understanding/api",
@@ -16,14 +18,21 @@ def init_nlu_engine():
 
 nlu = init_nlu_engine()
 
-def analyze(text, location):
-    response = {}
+def analyze(doctree):
+    """ Analyzes the given DocTree and returns a generator of Entity objects. """
+    assert(isinstance(doctree, DocTree))
 
-    print('\nEntities in {}\n'.format(location))
+    title = doctree.get_title()
+    summary = doctree.get_summary()
+    body = doctree.get_body()
+    title_entities = _parse_entities(_query_nlu(title), doctree.title_word_at) if len(title) >= MIN_TEXT_LENGTH else []
+    summary_entities = _parse_entities(_query_nlu(summary), doctree.summary_word_at) if len(summary) >= MIN_TEXT_LENGTH else []
+    body_entities = _parse_entities(_query_nlu(body), doctree.body_word_at) if len(body) >= MIN_TEXT_LENGTH else []
 
-    #try:
-    """Analyzes the given text and returns a generator of Entity objects."""
-    response = nlu.analyze(
+    return AnalyzeResult(title_entities, summary_entities, body_entities)
+
+def _query_nlu(text):
+    return nlu.analyze(
         text=text,
         features=Features(
             entities=EntitiesOptions(
@@ -33,11 +42,6 @@ def analyze(text, location):
             semantic_roles=SemanticRolesOptions(limit=100, entities=True, keywords=True)
         )
     )
-    #except Exception:
-    #    print("\n\nProbably not enough text for language exception\n\n")
-
-    return _parse_entities(response)
-
 
 def _parse_entities(response):
 
@@ -83,6 +87,18 @@ def _parse_entities(response):
 
             yield Entity(name, ttype, score, mentions, phrases)
 
+def _parse_mention(m, word_lookup_func):
+    text = m['text']
+    location = m['location']
+    word = word_lookup_func(location[0])
+    assert(word is not None) # This should not happen; implies that NLU gave us a bad location value
+    return (text, word)
+
+class AnalyzeResult:
+    def __init__(self, title_entities, summary_entities, body_entitites):
+        self.title_entities = title_entities
+        self.summary_entities = summary_entities
+        self.body_entitites = body_entitites
 
 class Entity:
     def __init__(self, name, ttype, sentiment_score, mentions, phrases):
