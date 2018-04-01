@@ -6,6 +6,7 @@ import json
 
 MIN_TEXT_LENGTH = 50
 
+
 def init_nlu_engine():
     url = "https://gateway.watsonplatform.net/natural-language-understanding/api",
     username = "5c878ccb-456a-433b-a8de-0f9e0dc41032"
@@ -18,8 +19,9 @@ def init_nlu_engine():
 
 nlu = init_nlu_engine()
 
+
 def analyze(doctree):
-    """ Analyzes the given DocTree and returns a generator of Entity objects. """
+    """Analyzes the given DocTree and returns a generator of Entity objects. """
     assert(isinstance(doctree, DocTree))
 
     title = doctree.get_title()
@@ -31,7 +33,9 @@ def analyze(doctree):
 
     return AnalyzeResult(title_entities, summary_entities, body_entities)
 
+
 def _query_nlu(text):
+    """Responsible for the actual Watson NLU call"""
     return nlu.analyze(
         text=text,
         features=Features(
@@ -43,8 +47,9 @@ def _query_nlu(text):
         )
     )
 
-def _parse_entities(response, word_lookup_func):
 
+def _parse_entities(response, word_lookup_func):
+    """Given JSON response from NLU query, replace mentions with proper WordNode and construct Entities"""
     # print(json.dumps(response, sort_keys=True, indent=4))
 
     if 'entities' in response:
@@ -87,20 +92,26 @@ def _parse_entities(response, word_lookup_func):
 
             yield Entity(name, ttype, score, mentions, phrases)
 
+
 def _parse_mention(m, word_lookup_func):
+    """Replace integer location in mention with WordNode"""
     text = m['text']
     location = m['location']
     word = word_lookup_func(location[0])
     assert(word is not None) # This should not happen; implies that NLU gave us a bad location value
     return (text, word, False)
 
+
 class AnalyzeResult:
+    """Compilation of all Entities for one Article"""
     def __init__(self, title_entities, summary_entities, body_entitites):
         self.title_entities = title_entities
         self.summary_entities = summary_entities
         self.body_entitites = body_entitites
 
+
 class Entity:
+    """Important noun in Article"""
     def __init__(self, name, ttype, sentiment_score, mentions, phrases):
         self.name = name
         self.type = ttype

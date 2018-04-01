@@ -39,7 +39,7 @@ def results(request):
         discovery_results = dm.query_discovery(query)
     except LookupError:
         print("Unknown UTF Encoding")
-    censored_results = nlu.censor_results(discovery_results, censorship_desc.lower())
+    censored_results = nlu.censor_results(discovery_results, censorship_desc.lower(), query)
 
     result_bodies = []
     for r in censored_results:
@@ -64,6 +64,7 @@ def result(request):
     censorship = request.session.get('censorship', '')
     resultId = request.GET.get('resultId', '0')
     title = request.GET.get('title', '')
+    query = request.session.get('query', '')
 
     body = ''
     try:
@@ -73,9 +74,8 @@ def result(request):
         logging.exception('Invalid result ID provided')
     except:
         raise
-    
-    #body = cm.censor_body(body, censorship)
-    body = nlu.censor_body(body, censorship)
+
+    body = nlu.censor_body(body, censorship, query)
 
     return render(
         request,
