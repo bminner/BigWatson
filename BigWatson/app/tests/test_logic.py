@@ -133,8 +133,8 @@ class HelpersTest(TestCase):
         edited_to_be_positive = helper.replace_adjectives_with_antonym(negative_text, neg_adjective_seq)
 
 
-        self.assertEqual('the dog is a <strong>bad</strong> boy', edited_to_be_negative)
-        self.assertEqual('the dog is a <strong>good</strong> boy', edited_to_be_positive)
+        self.assertEqual('the dog is a <div class="tooltip"><strong>bad</strong><span class="tooltiptext">good</span></div> boy', edited_to_be_negative)
+        self.assertEqual('the dog is a <div class="tooltip"><strong>good</strong><span class="tooltiptext">bad</span></div> boy', edited_to_be_positive)
 
     """
     # these tests use hypernyms, which we won't be using quite yet, so they're commented out.
