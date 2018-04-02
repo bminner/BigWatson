@@ -34,13 +34,13 @@ def _censor_title_and_summary(original_article, doctree, u_censor_selection, u_q
     analyze_result = analyze(doctree)
 
     # find WordNodes to censor
-    title_nodes_to_censor = _find_word_nodes_to_censor(doctree, analyze_result.title_entities, u_query, DocTree.title_sentence_at)
-    summary_nodes_to_censor = _find_word_nodes_to_censor(doctree, analyze_result.summary_entities, u_query, DocTree.summary_sentence_at)
+    title_sentences_and_wordnodes = _find_word_nodes_to_censor(doctree, analyze_result.title_entities, u_query, DocTree.title_sentence_at)
+    summary_sentences_and_wordnodes = _find_word_nodes_to_censor(doctree, analyze_result.summary_entities, u_query, DocTree.summary_sentence_at)
 
     # pass that list to nltk, which will change content of each WordNode
     # call Kurt's stuff here!
-    # censor(title_nodes_to_censor, u_censor_selection)
-    # censor(summary_nodes_to_censor, u_censor_selection)
+    # censor(title_sentences_and_wordnodes, u_censor_selection)
+    # censor(summary_sentences_and_wordnodes, u_censor_selection)
 
     censored = Article.Article(doctree.get_title(), Article.Article.from_article(original_article).url,
                        doctree.get_summary(), Article.Article.from_article(original_article).body,
@@ -60,11 +60,11 @@ def censor_body(body, u_censor_selection, u_query):
     analyze_result = analyze(doctree)
 
     # find WordNodes to censor
-    body_nodes_to_censor = _find_word_nodes_to_censor(doctree, analyze_result.body_entities, u_query, DocTree.body_sentence_at)
+    body_sentences_and_wordnodes = _find_word_nodes_to_censor(doctree, analyze_result.body_entities, u_query, DocTree.body_sentence_at)
 
     # pass that list to nltk, which will change content of each WordNode
     # call Kurt's stuff here!
-    # censor(body_nodes_to_censor, u_censor_selection)
+    # censor(body_sentences_and_wordnodes, u_censor_selection)
 
     censored = doctree.get_body()
 
@@ -75,6 +75,7 @@ def _find_word_nodes_to_censor(doctree, entity_list, u_query, sentence_at_callba
     """Logic to find WordNodes to censor based on mentions and phrases in Entities"""
 
     word_nodes_to_censor = []
+    sentence_and_wordnodes= []
 
     # for each entity
     for e in entity_list:
@@ -91,5 +92,7 @@ def _find_word_nodes_to_censor(doctree, entity_list, u_query, sentence_at_callba
                 for word_index in range(mention_sn.length):
                     if isinstance(mention_sn.word_at(word_index), WordNode) and mention_sn.word_at(word_index).text in words_to_censor:
                         word_nodes_to_censor.append(mention_sn.word_at(word_index))
+                sentence_and_wordnodes.append((mention_sn.original_text, word_nodes_to_censor))
+                word_nodes_to_censor = []
 
-    return word_nodes_to_censor
+    return sentence_and_wordnodes
