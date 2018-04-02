@@ -81,15 +81,14 @@ def _find_word_nodes_to_censor(doctree, entity_list, u_query, sentence_at_callba
         # if it is the entity we are searching for
         if e.name == u_query:
             # for every mention
-            for mention_index in range(len(e.mentions)):
-                # get WordNode in mention
-                mention_wn = e.mentions[mention_index][1]
+            for i, mention in enumerate(e.mentions):
+                mention_wn = mention[1]
                 # based on that, find the sentence that Node is in
                 mention_sn = sentence_at_callback(doctree, mention_wn.get_start_index())
                 # gather list of WordNodes in entity phrase
-                words_to_censor = e.phrases[mention_index].split(' ')
-                for word_index in range(mention_sn.length):
-                    if isinstance(mention_sn.word_at(word_index), WordNode) and mention_sn.word_at(word_index).text in words_to_censor:
-                        word_nodes_to_censor.append(mention_sn.word_at(word_index))
+                words_to_censor = e.phrases[i].split(' ')
+                for to_censor in words_to_censor:
+                    matched_word_nodes = mention_sn.find(to_censor)
+                    word_nodes_to_censor = word_nodes_to_censor + matched_word_nodes
 
     return word_nodes_to_censor
