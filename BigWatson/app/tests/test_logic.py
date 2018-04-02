@@ -5,7 +5,12 @@ from django.test import TestCase
 import json
 from nltk.corpus import wordnet as wn
 from ..logic.helpers import QueryHelper
-from ..logic.nlu_censor_manager import censor_body
+from ..models import Article
+from ..logic import doctree as dt
+from ..logic.doctree import WordNode, DocTree
+from ..NLU import analyzer
+from ..NLU.analyzer import Entity, AnalyzeResult
+from ..logic.nlu_censor_manager import censor_body, _censor_title_and_summary, _find_word_nodes_to_censor
 from ..logic.helpers import WordNetHelper
 
 
@@ -38,6 +43,14 @@ class HelpersTest(TestCase):
             results.append(result)
         
         return results
+
+    def create_mock_article(self):
+        """Creates a mock article for use in tests"""
+        return Article.Article('The Ohio State University is the best college in the land', 'http://www.sampleurl.com',
+                               'This is an article saying that the Ohio State University is great. '
+                               'The school is horrible.', 'This is an article saying that the Ohio State '
+                               'University is great. The school is horrible. Also this is an extra line to '
+                                                          'talk about Brutus. Finally, Urban Meyer is great.', 0.0)
             
     def test_get_article_data(self):
         helper = self.create_mock_query_helper()
@@ -156,19 +169,55 @@ class HelpersTest(TestCase):
         self.assertEqual('the <strong>canine</strong> is a <strong>bad</strong> <strong>male</strong>', censored_text)
     """
 
-"""  
-class NLUTest(TestCase):
-    def test_censor_body(self):
-        body = "Tom Brady is amazing.Donald Trump is an idiot and awful president and Tom Brady is my hero.North Korea is the worst country in the world."
-        good_class = 'positive'
-        results = censor_body(body, good_class)
-        print("First results = " + str(results))
-        censored_result = "<del>Donald Trump is an idiot and awful president</del>. Cats are cool and I like bunnies. <del>North Korea is the worst country in the world</del>. "
+    """  
+    class NLUTest(TestCase):
+        def test_censor_body(self):
+            body = "Tom Brady is amazing.Donald Trump is an idiot and awful president and Tom Brady is my hero.North Korea is the worst country in the world."
+            good_class = 'positive'
+            results = censor_body(body, good_class)
+            print("First results = " + str(results))
+            censored_result = "<del>Donald Trump is an idiot and awful president</del>. Cats are cool and I like bunnies. <del>North Korea is the worst country in the world</del>. "
+    
+            print("censored = " + str(censored_result))
+            print("results given = " + str(results))
+            self.assertEqual(censored_result,results)"""
 
-        print("censored = " + str(censored_result))
-        print("results given = " + str(results))
-        self.assertEqual(censored_result,results)"""
+    def test_parse_entities(self):
+        article = self.create_mock_article()
+        doctree = dt.DocTree(article)
+        nlu_result = analyzer._query_nlu(Article.Article.from_article(article).body)
+        body_gen = analyzer._parse_entities(nlu_result, doctree.body_word_at)
+        entity_list = []
+        for entity in body_gen:
+            entity_list.append(entity)
+        assert(len(entity_list) == 3)
+        assert(entity_list[0].name == 'Ohio State University')
+        assert(entity_list[1].mentions[0][2])
+        assert(entity_list[1].phrases[0] == 'great')
 
+    def test_analyze(self):
+        article = self.create_mock_article()
+        doctree = dt.DocTree(article)
+        result = analyzer.analyze(doctree)
+        entity_list = []
+        for entity in result.body_entitites:
+            entity_list.append(entity)
+        assert(len(entity_list) == 3)
+
+    # def test_censor_title_and_summary(self):
+    #    pass
+
+    # def test_censor_body(self):
+    #    pass
+
+    def test_find_word_nodes_to_censor(self):
+        article = self.create_mock_article()
+        doctree = DocTree(article)
+        result = analyzer.analyze(doctree)
+        words_to_censor = _find_word_nodes_to_censor(doctree, result.body_entitites, 'Urban Meyer', DocTree.body_sentence_at)
+        print(words_to_censor)
+        assert(len(words_to_censor) == 1)
+        assert(words_to_censor[0].text == 'great')
 
 class MockExtractor():
     """ Object used in place of Goose to unit test get_article_data() """

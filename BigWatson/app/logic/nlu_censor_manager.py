@@ -60,7 +60,7 @@ def censor_body(body, u_censor_selection, u_query):
     analyze_result = analyze(doctree)
 
     # find WordNodes to censor
-    body_nodes_to_censor = _find_word_nodes_to_censor(doctree, analyze_result.title_entities, u_query, DocTree.body_sentence_at)
+    body_nodes_to_censor = _find_word_nodes_to_censor(doctree, analyze_result.body_entities, u_query, DocTree.body_sentence_at)
 
     # pass that list to nltk, which will change content of each WordNode
     # call Kurt's stuff here!
