@@ -23,9 +23,9 @@ def analyze(doctree):
     """Analyzes the given DocTree and returns a generator of Entity objects. """
     assert(isinstance(doctree, DocTree))
 
-    title = doctree.get_title()
-    summary = doctree.get_summary()
-    body = doctree.get_body()
+    title = doctree.original_title
+    summary = doctree.original_summary
+    body = doctree.original_body
     title_entities = _parse_entities(_query_nlu(title), doctree.title_word_at) if len(title) >= MIN_TEXT_LENGTH else []
     summary_entities = _parse_entities(_query_nlu(summary), doctree.summary_word_at) if len(summary) >= MIN_TEXT_LENGTH else []
     body_entities = _parse_entities(_query_nlu(body), doctree.body_word_at) if len(body) >= MIN_TEXT_LENGTH else []
@@ -101,10 +101,10 @@ def _parse_mention(m, word_lookup_func):
 
 class AnalyzeResult:
     """Compilation of all Entities for one Article"""
-    def __init__(self, title_entities, summary_entities, body_entitites):
+    def __init__(self, title_entities, summary_entities, body_entities):
         self.title_entities = title_entities
         self.summary_entities = summary_entities
-        self.body_entities = body_entitites
+        self.body_entities = body_entities
 
 
 class Entity:
