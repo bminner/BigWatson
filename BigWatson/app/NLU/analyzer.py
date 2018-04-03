@@ -19,7 +19,6 @@ def init_nlu_engine():
 
 nlu = init_nlu_engine()
 
-
 def analyze(doctree):
     """Analyzes the given DocTree and returns a generator of Entity objects. """
     assert(isinstance(doctree, DocTree))
@@ -105,7 +104,7 @@ class AnalyzeResult:
     def __init__(self, title_entities, summary_entities, body_entitites):
         self.title_entities = title_entities
         self.summary_entities = summary_entities
-        self.body_entitites = body_entitites
+        self.body_entities = body_entitites
 
 
 class Entity:
