@@ -23,9 +23,9 @@ def analyze(doctree):
     """Analyzes the given DocTree and returns a generator of Entity objects. """
     assert(isinstance(doctree, DocTree))
 
-    title = doctree.get_title()
-    summary = doctree.get_summary()
-    body = doctree.get_body()
+    title = doctree.original_title
+    summary = doctree.original_summary
+    body = doctree.original_body
     title_entities = _parse_entities(_query_nlu(title), doctree.title_word_at) if len(title) >= MIN_TEXT_LENGTH else []
     summary_entities = _parse_entities(_query_nlu(summary), doctree.summary_word_at) if len(summary) >= MIN_TEXT_LENGTH else []
     body_entities = _parse_entities(_query_nlu(body), doctree.body_word_at) if len(body) >= MIN_TEXT_LENGTH else []
