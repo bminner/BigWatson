@@ -174,9 +174,8 @@ class CensorHelper:
         """
         Censors words in wordnodes dict depending on the censorship level.
         """
-        censorship_dict = {1: 'negative', 2: 'neutral', 3: 'positive'}
 
-        if censorship == 2:
+        if censorship == 'neutral':
             censor = self.censor_neutral
         else:
             censor = self.censor_pos_neg
@@ -186,7 +185,9 @@ class CensorHelper:
             sentence = pair[0]
             nodes = pair[1]
 
+            print("tagging....")
             tagged_text = pos_tag(word_tokenize(sentence))
+            print('TAGGED TEXT: ' + tagged_text)
             for wordtag in tagged_text:
                 if wordtag[1] == 'JJ':
                     print('I FOUND AN ADJECTIVE. IT IS: ' + wordtag[0])
@@ -205,7 +206,7 @@ class CensorHelper:
         nouns = wordnodes['nouns']
 
         # get list of censored wordnodes
-        censored = censor(adjectives, nouns, censorship_dict[censorship])
+        censored = censor(adjectives, nouns, censorship)
         return censored
     
     def censor_pos_neg(self, adjectives, nouns, censorship):
