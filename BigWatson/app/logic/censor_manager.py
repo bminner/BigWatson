@@ -23,7 +23,7 @@ def censor_results(discovery_results, good_class):
 ### Start with an entire page, break it blocks to analyze, censor from there
 ###
 def censor_body(body, good_class):
-    print(good_class)
+    #print(good_class)
     POSSIBLE_CLASSES = ['positive', 'negative']
 
     sentences = body.split('.')
@@ -35,22 +35,26 @@ def censor_body(body, good_class):
         #fragments from splitting on periods
         if len(sentence) > 0:
             cls, conf = classify_sentence(sentence)
-            print(cls, conf)
+            #print(cls, conf)
 
         #basically if nuetral and very confident
         if good_class not in POSSIBLE_CLASSES:
             if conf > .9:
                 try:
-                    print("Strong Feelings: " + sentence)
+                    #print("Strong Feelings: " + sentence)
+                    pass
                 except UnicodeEncodeError:
-                    print("unicode shit")
+                    #print("unicode shit")
+                    pass
                 sentences[i] = '<del>' + sentence + '</del>'
         #if not what we're aiming for
         elif cls != good_class and conf > .4:
             try:
-                print("Bad hombre:" + sentence)
+                #print("Bad hombre:" + sentence)
+                pass
             except UnicodeEncodeError:
-                print("unicode shit")
+                #print("unicode shit")
+                pass
             sentences[i] = '<del>' + sentence + '</del>'
 
     censored_body = '. '.join(sentences)
@@ -60,7 +64,7 @@ def censor_body(body, good_class):
 def censor_title_and_summary(article, good_class):
     """ censors and returns an article's title and summary. """
 
-    print(good_class)
+    #print(good_class)
     POSSIBLE_CLASSES = ['positive', 'negative']
 
     censored = Article.Article.from_article(article)
@@ -74,22 +78,26 @@ def censor_title_and_summary(article, good_class):
         #fragments from splitting on periods
         if len(sentence) > 0:
             cls, conf = classify_sentence(sentence)
-            print(cls, conf)
+            #print(cls, conf)
 
         #basically if nuetral and very confident
         if good_class not in POSSIBLE_CLASSES:
             if conf > .9:
                 try:
-                    print("Strong Feelings: " + sentence)
+                    #print("Strong Feelings: " + sentence)
+                    pass
                 except UnicodeEncodeError:
-                    print("unicode shit")
+                    #print("unicode shit")
+                    pass
                 summary_sents[i] = '<del>' + sentence + '</del>'
         #if not what we're aiming for
         elif cls != good_class and conf > .4:
             try:
-                print("Bad hombre:" + sentence)
+                #print("Bad hombre:" + sentence)
+                    pass
             except UnicodeEncodeError:
-                print("unicode shit")
+                #print("unicode shit")
+                    pass
             summary_sents[i] = '<del>' + sentence + '</del>'
 
     title_sents = censored.title.split('.')
@@ -101,22 +109,26 @@ def censor_title_and_summary(article, good_class):
         #fragments from splitting on periods
         if len(sentence) > 0:
             cls, conf = classify_sentence(sentence)
-            print(cls, conf)
+            #print(cls, conf)
 
         #basically if nuetral and very confident
         if good_class not in POSSIBLE_CLASSES:
             if conf > .9:
                 try:
-                    print("Strong Feelings: " + sentence)
+                    #print("Strong Feelings: " + sentence)
+                    pass
                 except UnicodeEncodeError:
-                    print("unicode shit")
+                    #print("unicode shit")
+                    pass
                 title_sents[i] = '<del>' + sentence + '</del>'
         #if not what we're aiming for
         elif cls != good_class and conf > .4:
             try:
-                print("Bad hombre:" + sentence)
+                #print("Bad hombre:" + sentence)
+                    pass
             except UnicodeEncodeError:
-                print("unicode shit")
+                #print("unicode shit")
+                    pass
             title_sents[i] = '<del>' + sentence + '</del>'
 
     censored_summary = '. '.join(summary_sents)

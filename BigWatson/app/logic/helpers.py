@@ -170,7 +170,7 @@ class CensorHelper:
                  username='4d49cfca-bcdc-4ed9-a673-5d561faac440',
                  password='GbojuhoOT5rG')
 
-    def censor_wordnodes(self, wordnodes, censorship):
+    def censor_wordnodes(self, sentence_and_wordnodes, censorship):
         """
         Censors words in wordnodes dict depending on the censorship level.
         """
@@ -180,7 +180,27 @@ class CensorHelper:
             censor = self.censor_neutral
         else:
             censor = self.censor_pos_neg
-        
+
+        wordnodes = {'adjs':[], 'nouns':[]}
+        for pair in sentence_and_wordnodes:
+            sentence = pair[0]
+            nodes = pair[1]
+
+            tagged_text = pos_tag(word_tokenize(sentence))
+            for wordtag in tagged_text:
+                if wordtag[1] == 'JJ':
+                    print('I FOUND AN ADJECTIVE. IT IS: ' + wordtag[0])
+                    for node in nodes:
+                        if wordtag[0] == node.text:
+                            wordnodes['adjs'].append(node)
+                            break
+                elif len(wordtag[0]) > 2 and (wordtag[1] == 'NN' or wordtag[1] == 'NNS'):
+                    print('I FOUND A NOUN. IT IS: ' + wordtag[0])
+                    for node in nodes:
+                        if wordtag[0] == node.text:
+                            wordnodes['nouns'].append(node)
+                            break
+
         adjectives = wordnodes['adjs']
         nouns = wordnodes['nouns']
 
@@ -210,10 +230,12 @@ class CensorHelper:
 
         for node in adjectives:
             word = node.text
+            prefix = '<div class=\"tooltip\">'
+            suffix = '<span class=\"tooltiptext\">' + word + '</span></div>'
             classes = self.classifier.classify(self.classifier_id, word)
             confidence = classes['classes'][0]['confidence']
             if confidence >= 0.92:
-                replacement = '<del>' + word + '</del>'
+                replacement = prefix + '<del>' + word + '</del>' + suffix
                 node.update_text(replacement)
                 censored.append(node)
             else:

@@ -24,12 +24,14 @@ def censor_article(article):
         pos_conf = 1
         if len(sentence) > 0:
             cls, pos_conf = classify_sentence(sentence)
-            print(cls)
+            #print(cls)
         if pos_conf < .33:
             try:
-                print("Bad hombre:" + sentence)
+                # print("Bad hombre:" + sentence)
+                pass
             except UnicodeEncodeError:
-                print("unicode shit")
+                # print("unicode shit")
+                pass
             sentences[i] = '<del>' + sentence + '</del>'
 
     censored_body = ' '.join(sentences)
