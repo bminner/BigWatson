@@ -24,7 +24,7 @@ class HelpersTest(TestCase):
 
     def create_mock_wordnet_helper(self, wordnet_client=wn):
         return WordNetHelper(wordnet_client)
-    
+
     def create_mock_results(self):
         """ Creates list of results in the format of a Discovery query result """
         results = []
@@ -41,7 +41,7 @@ class HelpersTest(TestCase):
                 }
             }
             results.append(result)
-        
+
         return results
 
     def create_mock_article(self):
@@ -51,7 +51,7 @@ class HelpersTest(TestCase):
                                'The school is horrible.', 'This is an article saying that the Ohio State '
                                'University is great. The school is horrible. Also this is an extra line to '
                                                           'talk about Brutus. Finally, Urban Meyer is great.', 0.0)
-            
+
     def test_get_article_data(self):
         helper = self.create_mock_query_helper()
 
@@ -66,7 +66,7 @@ class HelpersTest(TestCase):
 
         self.assertEqual('summary', task_results[0][1]['summary'])
         self.assertEqual('body', task_results[0][1]['body'])
-    
+
     def test_get_article_data_no_meta_description_returns_body(self):
         helper = self.create_mock_query_helper(meta_description='')
 
@@ -103,7 +103,7 @@ class HelpersTest(TestCase):
         self.assertEqual(203, len(truncated_string))
         self.assertEqual(truncated_string, task_results[0][1]['summary'])
         self.assertEqual(long_string, task_results[0][1]['body'])
-    
+
     def test_parse_discovery_results(self):
         results = self.create_mock_results()
         helper = self.create_mock_query_helper()
@@ -159,7 +159,7 @@ class HelpersTest(TestCase):
         edited_text = helper.replace_nouns_with_hypernyms(text, noun_seq)
 
         self.assertEqual('the <strong>canine</strong> is a good <strong>male</strong>', edited_text)
-        
+
     def test_censor_text_censors_adjectives_and_nouns(self):
         helper = self.create_mock_wordnet_helper()
         text = 'the dog is a good boy'
@@ -169,7 +169,7 @@ class HelpersTest(TestCase):
         self.assertEqual('the <strong>canine</strong> is a <strong>bad</strong> <strong>male</strong>', censored_text)
     """
 
-    """  
+    """
     class NLUTest(TestCase):
         def test_censor_body(self):
             body = "Tom Brady is amazing.Donald Trump is an idiot and awful president and Tom Brady is my hero.North Korea is the worst country in the world."
@@ -177,7 +177,7 @@ class HelpersTest(TestCase):
             results = censor_body(body, good_class)
             print("First results = " + str(results))
             censored_result = "<del>Donald Trump is an idiot and awful president</del>. Cats are cool and I like bunnies. <del>North Korea is the worst country in the world</del>. "
-    
+
             print("censored = " + str(censored_result))
             print("results given = " + str(results))
             self.assertEqual(censored_result,results)"""
@@ -225,8 +225,6 @@ class MockExtractor():
     def __init__(self, meta_description, cleaned_text):
         self.meta_description = meta_description
         self.cleaned_text = cleaned_text
-    
+
     def extract(self, url):
         return self
-
- 

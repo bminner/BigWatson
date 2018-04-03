@@ -35,6 +35,10 @@ class SentenceNode:
         """
         return _binary_search_nodes(index, self.word_nodes)
 
+    def find(self, word_text):
+        """ Returns a list of all word nodes in this sentence matching 'word_text'. """
+        return list(filter(lambda n: n.text == word_text, self.word_nodes))
+
     def delete(self, word):
         assert(word in self.word_nodes)
         arr_index = self.word_nodes.index(word)
