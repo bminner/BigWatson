@@ -15,7 +15,8 @@ class SentenceNode:
         # Create word nodes
         head_index = index_start
         relative_offset = head_index.get()
-        for word in word_tokenizer.tokenize(text):
+        tokens = word_tokenizer.tokenize(text, escape=False)
+        for word in tokens:
             last = head_index.get() - relative_offset
             offset = text.index(word, last) - last
             node = WordNode(word, head_index.next(offset))
@@ -34,6 +35,10 @@ class SentenceNode:
             If the index lies in leading whitespace, the whitespace string will be returned.
         """
         return _binary_search_nodes(index, self.word_nodes)
+
+    def find(self, word_text):
+        """ Returns a list of all word nodes in this sentence matching 'word_text'. """
+        return list(filter(lambda n: n.text == word_text, self.word_nodes))
 
     def delete(self, word):
         assert(word in self.word_nodes)
@@ -133,7 +138,7 @@ class DocTree:
     def title_sentence_at(self, index):
         """Returns the title sentence at the given document index."""
 
-        return _binary_search_nodes(index, self.summary_nodes)
+        return _binary_search_nodes(index, self.title_nodes)
 
     def body_word_at(self, index):
         sentence = self.body_sentence_at(index)
@@ -196,13 +201,17 @@ def _binary_search_nodes(index, nodes):
 
 class LinkedIndex:
     def __init__(self, offset, parent=None):
+        assert parent != self
         self.offset = offset
         self.parent = parent
 
     def get(self):
-        if self.parent is None:
-            return self.offset
-        return self.offset + self.parent.get()
+        offset = self.offset
+        prev = self.parent
+        while prev is not None:
+            offset += prev.offset
+            prev = prev.parent
+        return offset
 
     def next(self, offset):
         return LinkedIndex(offset, parent=self)
