@@ -214,10 +214,10 @@ class HelpersTest(TestCase):
         article = self.create_mock_article()
         doctree = DocTree(article)
         result = analyzer.analyze(doctree)
-        words_to_censor = _find_word_nodes_to_censor(doctree, result.body_entitites, 'Urban Meyer', DocTree.body_sentence_at)
-        print(words_to_censor)
-        assert(len(words_to_censor) == 1)
-        assert(words_to_censor[0].text == 'great')
+        sentence_and_wordnodes = _find_word_nodes_to_censor(doctree, result.body_entitites, 'Urban Meyer', DocTree.body_sentence_at)
+        assert(len(sentence_and_wordnodes) == 1)
+        assert(sentence_and_wordnodes[0][0] == 'Finally, Urban Meyer is great.')
+        assert(sentence_and_wordnodes[0][1][0].text == 'great')
 
 class MockExtractor():
     """ Object used in place of Goose to unit test get_article_data() """
