@@ -207,13 +207,23 @@ class CensorHelper:
         """ neutral censorship. returns list of censored WordNodes. """
 
         censored = []
-        all_wordnodes = adjectives + nouns
 
-        for node in all_wordnodes:
+        for node in adjectives:
             word = node.text
             classes = self.classifier.classify(self.classifier_id, word)
             confidence = classes['classes'][0]['confidence']
-            if confidence >= 0.8:
+            if confidence >= 0.92:
+                replacement = '<del>' + word + '</del>'
+                node.update_text(replacement)
+                censored.append(node)
+            else:
+                censored.append(node)
+
+        for node in nouns:
+            word = node.text
+            classes = self.classifier.classify(self.classifier_id, word)
+            confidence = classes['classes'][0]['confidence']
+            if confidence >= 0.92:
                 hypernym = self.find_hypernym(word)
                 node.update_text(hypernym)
                 censored.append(node)
@@ -226,7 +236,7 @@ class CensorHelper:
         word = node.text
         classes = self.classifier.classify(self.classifier_id, word)
         top_class = classes['top_class']
-        if top_class == swap_class:
+        if top_class != swap_class:
             replacement = replace(word)
             node.update_text(replacement)
 
@@ -261,7 +271,7 @@ class CensorHelper:
 
         for s in syns:
             if s.hypernyms():
-                hypernym = prefix + '<strong>' + s.hypernyms()[-1].name().split('.')[0] + '</strong>' + suffix
+                hypernym = prefix + '<strong>' + s.hypernyms()[0].name().split('.')[0] + '</strong>' + suffix
                 hypernym = hypernym.replace('_', ' ')
                 break
 

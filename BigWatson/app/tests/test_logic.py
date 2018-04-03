@@ -4,9 +4,9 @@ import asyncio
 from django.test import TestCase
 import json
 from nltk.corpus import wordnet as wn
-from ..logic.helpers import QueryHelper
+from ..logic.helpers import QueryHelper, WordNetHelper, CensorHelper
 from ..logic.nlu_censor_manager import censor_body
-from ..logic.helpers import WordNetHelper
+from ..logic.doctree import WordNode, LinkedIndex
 
 
 class HelpersTest(TestCase):
@@ -38,6 +38,31 @@ class HelpersTest(TestCase):
             results.append(result)
         
         return results
+    
+    def create_mock_wordnode_list(self):
+        wordnodes = {'adjs':[], 'nouns':[]}
+        wordnodes['adjs'] = [
+                 WordNode('evil', LinkedIndex(0)),
+                 WordNode('stupid',LinkedIndex(0)),
+                 WordNode('good',LinkedIndex(0)),
+                 WordNode('bad',LinkedIndex(0)),
+                 WordNode('terrific',LinkedIndex(0))
+        ]
+        wordnodes['nouns'] = [
+                 WordNode('idiot',LinkedIndex(0)),
+                 WordNode('genius',LinkedIndex(0)),
+                 WordNode('man',LinkedIndex(0)),
+                 WordNode('slut',LinkedIndex(0)),
+        ]
+
+        return wordnodes
+    
+    def test_censor_wordnodes_censors_to_be_positive(self):
+        helper = CensorHelper()
+        wordnodes = self.create_mock_wordnode_list()
+        print(str(wordnodes))
+        censored = helper.censor_wordnodes(wordnodes, 2)
+        print(str(censored))
             
     def test_get_article_data(self):
         helper = self.create_mock_query_helper()
