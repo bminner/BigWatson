@@ -2,7 +2,6 @@ __author__ = 'Kurtis'
 
 from ..models.Article import Article
 from ..logic.helpers import QueryHelper
-from ..logic import censor_manager
 from watson_developer_cloud import DiscoveryV1
 from goose3 import Goose
 

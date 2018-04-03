@@ -2,7 +2,7 @@ __author__ = 'Nicholas'
 
 import string
 import random
-from BigWatson.app.logic import discovery_manager
+from ..logic import discovery_manager
 from watson_developer_cloud import DiscoveryV1
 import os
 import json
