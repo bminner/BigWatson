@@ -5,7 +5,6 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 from ..models.Article import Article
 from nltk.data import path as nltk_path
 nltk_path.append(dir_path + '/nltk_data')
-from nltk.corpus import wordnet as wn
 from nltk.tag import pos_tag
 from nltk.tokenize import word_tokenize
 import asyncio
