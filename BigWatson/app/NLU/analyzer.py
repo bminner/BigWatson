@@ -101,10 +101,10 @@ def _parse_mention(m, word_lookup_func):
 
 class AnalyzeResult:
     """Compilation of all Entities for one Article"""
-    def __init__(self, title_entities, summary_entities, body_entitites):
+    def __init__(self, title_entities, summary_entities, body_entities):
         self.title_entities = title_entities
         self.summary_entities = summary_entities
-        self.body_entities = body_entitites
+        self.body_entities = body_entities
 
 
 class Entity:

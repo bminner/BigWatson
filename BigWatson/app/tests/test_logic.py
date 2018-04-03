@@ -200,7 +200,7 @@ class HelpersTest(TestCase):
         doctree = dt.DocTree(article)
         result = analyzer.analyze(doctree)
         entity_list = []
-        for entity in result.body_entitites:
+        for entity in result.body_entities:
             entity_list.append(entity)
         assert(len(entity_list) == 3)
 
@@ -214,7 +214,7 @@ class HelpersTest(TestCase):
         article = self.create_mock_article()
         doctree = DocTree(article)
         result = analyzer.analyze(doctree)
-        sentence_and_wordnodes = _find_word_nodes_to_censor(doctree, result.body_entitites, 'Urban Meyer', DocTree.body_sentence_at)
+        sentence_and_wordnodes = _find_word_nodes_to_censor(doctree, result.body_entities, 'Urban Meyer', DocTree.body_sentence_at)
         assert(len(sentence_and_wordnodes) == 1)
         assert(sentence_and_wordnodes[0][0] == 'Finally, Urban Meyer is great.')
         assert(sentence_and_wordnodes[0][1][0].text == 'great')
