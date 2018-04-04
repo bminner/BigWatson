@@ -185,9 +185,8 @@ class CensorHelper:
             sentence = pair[0]
             nodes = pair[1]
 
-            print("tagging....")
             tagged_text = pos_tag(word_tokenize(sentence))
-            print('TAGGED TEXT: ' + tagged_text)
+
             for wordtag in tagged_text:
                 if wordtag[1] == 'JJ':
                     print('I FOUND AN ADJECTIVE. IT IS: ' + wordtag[0])

@@ -60,11 +60,6 @@ class HelpersTest(TestCase):
         ]
 
         return wordnodes
-    
-    def test_censor_wordnodes_censors_to_be_positive(self):
-        helper = CensorHelper()
-        wordnodes = self.create_mock_wordnode_list()
-        censored = helper.censor_wordnodes(wordnodes, 2)
             
 
     def create_mock_article(self):
