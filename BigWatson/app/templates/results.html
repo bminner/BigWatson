@@ -18,17 +18,24 @@
         <p id="showing-results">Showing results for: <strong>{{ query }}</strong></p>
         <p id="censorship">Censorship: <strong>{{ censorship }}</strong></p>
         <div style="clear:both;"></div>
-        {% for r in discovery_results %}
-            {% if r.body|length > 0 %}
-                <div class="result-card" id="working-result">
-                    <a href="{% url 'result' %}?title={{ r.title }}&resultId={{ forloop.counter0 }}">{{ r.title|safe }}</a>
-                    {% if r.summary|length > 0 %}
-                        <hr>
-                        <p>{{ r.summary|safe }}</p>
-                    {% endif %}
-                </div>
-            {% endif %}
-        {% endfor %}
+        {% if discovery_results|length == 0 %}
+        <div class="no-results">
+            <h1>Sorry :(</h1>
+            <h2>No results were found for that query.</h2>
+        </div>
+        {% else %}
+            {% for r in discovery_results %}
+                {% if r.body|length > 0 %}
+                    <div class="result-card" id="working-result">
+                        <a href="{% url 'result' %}?title={{ r.title }}&resultId={{ forloop.counter0 }}">{{ r.title|safe }}</a>
+                        {% if r.summary|length > 0 %}
+                            <hr>
+                            <p>{{ r.summary|safe }}</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
     </div>
     <a class="FAB" href="{% url 'index' %}">
         <i class="fa fa-search FAB-icon" aria-hidden="true"></i>

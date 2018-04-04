@@ -35,19 +35,26 @@ def results(request):
     except:
         raise
 
+    discovery_results = []
     try:
         discovery_results = dm.query_discovery(query)
     except LookupError:
         print("Unknown UTF Encoding")
-    censored_results = nlu.censor_results(discovery_results, censorship_desc.lower(), query)
+    except Exception:
+        pass
+    
+    censored_results = []
+    if len(discovery_results) > 0:
+        #censored_results = cm.censor_results(discovery_results, censorship_desc.lower())
+        censored_results = nlu.censor_results(discovery_results, censorship_desc.lower())
 
-    result_bodies = []
-    for r in censored_results:
-        result_bodies.append(r.body)
+        result_bodies = []
+        for r in censored_results:
+            result_bodies.append(r.body)
 
-    # Store body data in session for use across different views
-    request.session['results'] = result_bodies
-    request.session['censorship'] = censorship_desc
+        # Store body data in session for use across different views
+        request.session['results'] = result_bodies
+        request.session['censorship'] = censorship_desc
 
     return render(
         request,

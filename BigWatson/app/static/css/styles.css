@@ -49,7 +49,6 @@ body {
     -webkit-border-radius: 3;
     -moz-border-radius: 3;
     border-radius: 3px;
-    overflow: hidden;
     margin-bottom: 8px;
     padding: 16px;
 }
@@ -99,7 +98,6 @@ body {
     -moz-border-radius: 50;
     border-radius: 50px;
     border: none;
-    font-family: Arial;
     color: #ffffff;
     font-size: 20px;
     background: #2ec4b6;
@@ -228,8 +226,45 @@ p#showing-results {
     padding-top: 0;
     float: left;
 }
+
 p#censorship {
     margin-top: 0;
     padding-top: 0;
     float: right;
+}
+
+.no-results {
+    margin-top: 72px;
+}
+
+.no-results h1, .no-results h2 {
+    text-align: center;
+    font-weight: 300;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    width: 120px;
+    background-color: #2ec4b6;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 0;
+    
+    /* Position the tooltip */
+    position: absolute;
+    z-index: 10;
+    bottom: 100%;
+    left: 50%;
+    margin-left: -60px;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
 }
