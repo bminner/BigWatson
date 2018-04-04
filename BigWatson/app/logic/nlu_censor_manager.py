@@ -52,11 +52,10 @@ def _censor_title_and_summary(original_article, doctree, u_censor_selection, u_q
     return censored
 
 
-def censor_body(body, u_censor_selection, u_query):
+def     censor_body(original_article, u_censor_selection, u_query):
     """Censors Article body. Separate from title and summary to allow lazy censoring on click from views.py"""
 
     # recreate article and doctree
-    original_article = Article.Article('', '', '', body)
     doctree = DocTree(original_article)
 
     # get AnalyzeResult back from NLU
@@ -64,6 +63,7 @@ def censor_body(body, u_censor_selection, u_query):
 
     # find WordNodes to censor
     body_sentences_and_wordnodes = _find_word_nodes_to_censor(doctree, analyze_result.body_entities, u_query, DocTree.body_sentence_at)
+    print(body_sentences_and_wordnodes)
 
     # Perform censorship
     ch = CensorHelper()
