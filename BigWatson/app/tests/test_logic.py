@@ -5,7 +5,12 @@ from django.test import TestCase
 import json
 from nltk.corpus import wordnet as wn
 from ..logic.helpers import QueryHelper
-from ..logic.nlu_censor_manager import censor_body
+from ..models import Article
+from ..logic import doctree as dt
+from ..logic.doctree import WordNode, DocTree
+from ..NLU import analyzer
+from ..NLU.analyzer import Entity, AnalyzeResult
+from ..logic.nlu_censor_manager import censor_body, _censor_title_and_summary, _find_word_nodes_to_censor
 from ..logic.helpers import WordNetHelper
 
 
@@ -19,7 +24,7 @@ class HelpersTest(TestCase):
 
     def create_mock_wordnet_helper(self, wordnet_client=wn):
         return WordNetHelper(wordnet_client)
-    
+
     def create_mock_results(self):
         """ Creates list of results in the format of a Discovery query result """
         results = []
@@ -36,9 +41,17 @@ class HelpersTest(TestCase):
                 }
             }
             results.append(result)
-        
+
         return results
-            
+
+    def create_mock_article(self):
+        """Creates a mock article for use in tests"""
+        return Article.Article('The Ohio State University is the best college in the land', 'http://www.sampleurl.com',
+                               'This is an article saying that the Ohio State University is great. '
+                               'The school is horrible.', 'This is an article saying that the Ohio State '
+                               'University is great. The school is horrible. Also this is an extra line to '
+                                                          'talk about Brutus. Finally, Urban Meyer is great.', 0.0)
+
     def test_get_article_data(self):
         helper = self.create_mock_query_helper()
 
@@ -53,7 +66,7 @@ class HelpersTest(TestCase):
 
         self.assertEqual('summary', task_results[0][1]['summary'])
         self.assertEqual('body', task_results[0][1]['body'])
-    
+
     def test_get_article_data_no_meta_description_returns_body(self):
         helper = self.create_mock_query_helper(meta_description='')
 
@@ -90,7 +103,7 @@ class HelpersTest(TestCase):
         self.assertEqual(203, len(truncated_string))
         self.assertEqual(truncated_string, task_results[0][1]['summary'])
         self.assertEqual(long_string, task_results[0][1]['body'])
-    
+
     def test_parse_discovery_results(self):
         results = self.create_mock_results()
         helper = self.create_mock_query_helper()
@@ -146,7 +159,7 @@ class HelpersTest(TestCase):
         edited_text = helper.replace_nouns_with_hypernyms(text, noun_seq)
 
         self.assertEqual('the <strong>canine</strong> is a good <strong>male</strong>', edited_text)
-        
+
     def test_censor_text_censors_adjectives_and_nouns(self):
         helper = self.create_mock_wordnet_helper()
         text = 'the dog is a good boy'
@@ -156,19 +169,55 @@ class HelpersTest(TestCase):
         self.assertEqual('the <strong>canine</strong> is a <strong>bad</strong> <strong>male</strong>', censored_text)
     """
 
-"""  
-class NLUTest(TestCase):
-    def test_censor_body(self):
-        body = "Tom Brady is amazing.Donald Trump is an idiot and awful president and Tom Brady is my hero.North Korea is the worst country in the world."
-        good_class = 'positive'
-        results = censor_body(body, good_class)
-        print("First results = " + str(results))
-        censored_result = "<del>Donald Trump is an idiot and awful president</del>. Cats are cool and I like bunnies. <del>North Korea is the worst country in the world</del>. "
+    """
+    class NLUTest(TestCase):
+        def test_censor_body(self):
+            body = "Tom Brady is amazing.Donald Trump is an idiot and awful president and Tom Brady is my hero.North Korea is the worst country in the world."
+            good_class = 'positive'
+            results = censor_body(body, good_class)
+            print("First results = " + str(results))
+            censored_result = "<del>Donald Trump is an idiot and awful president</del>. Cats are cool and I like bunnies. <del>North Korea is the worst country in the world</del>. "
 
-        print("censored = " + str(censored_result))
-        print("results given = " + str(results))
-        self.assertEqual(censored_result,results)"""
+            print("censored = " + str(censored_result))
+            print("results given = " + str(results))
+            self.assertEqual(censored_result,results)"""
 
+    def test_parse_entities(self):
+        article = self.create_mock_article()
+        doctree = dt.DocTree(article)
+        nlu_result = analyzer._query_nlu(Article.Article.from_article(article).body)
+        body_gen = analyzer._parse_entities(nlu_result, doctree.body_word_at)
+        entity_list = []
+        for entity in body_gen:
+            entity_list.append(entity)
+        assert(len(entity_list) == 3)
+        assert(entity_list[0].name == 'Ohio State University')
+        assert(entity_list[1].mentions[0][2])
+        assert(entity_list[1].phrases[0] == 'great')
+
+    def test_analyze(self):
+        article = self.create_mock_article()
+        doctree = dt.DocTree(article)
+        result = analyzer.analyze(doctree)
+        entity_list = []
+        for entity in result.body_entities:
+            entity_list.append(entity)
+        assert(len(entity_list) == 3)
+
+    # def test_censor_title_and_summary(self):
+    #    pass
+
+    # def test_censor_body(self):
+    #    pass
+
+    def test_find_word_nodes_to_censor(self):
+        article = self.create_mock_article()
+        doctree = DocTree(article)
+        result = analyzer.analyze(doctree)
+        sentence_and_wordnodes = _find_word_nodes_to_censor(doctree, result.body_entities, 'Urban Meyer', DocTree.body_sentence_at)
+        assert(len(sentence_and_wordnodes) == 1)
+        assert(sentence_and_wordnodes[0][0] == 'Finally, Urban Meyer is great.')
+        assert(sentence_and_wordnodes[0][1][0].text == 'great')
 
 class MockExtractor():
     """ Object used in place of Goose to unit test get_article_data() """
@@ -176,8 +225,6 @@ class MockExtractor():
     def __init__(self, meta_description, cleaned_text):
         self.meta_description = meta_description
         self.cleaned_text = cleaned_text
-    
+
     def extract(self, url):
         return self
-
- 
