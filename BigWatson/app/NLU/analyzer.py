@@ -49,7 +49,7 @@ def _query_nlu(text):
 
 def _parse_entities(response, word_lookup_func):
     """Given JSON response from NLU query, replace mentions with proper WordNode and construct Entities"""
-    # print(json.dumps(response, sort_keys=True, indent=4))
+    print(json.dumps(response, sort_keys=True, indent=4))
 
     if 'entities' in response:
 
