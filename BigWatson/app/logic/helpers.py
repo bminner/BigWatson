@@ -6,6 +6,7 @@ from ..models.Article import Article
 from nltk.data import path as nltk_path
 nltk_path.append(dir_path + '/nltk_data')
 from nltk.corpus import wordnet as wn
+from nltk.corpus import sentiwordnet as swn
 from nltk.tag import pos_tag
 from nltk.tokenize import word_tokenize
 from watson_developer_cloud import NaturalLanguageClassifierV1
@@ -185,9 +186,7 @@ class CensorHelper:
             sentence = pair[0]
             nodes = pair[1]
 
-            print("tagging....")
             tagged_text = pos_tag(word_tokenize(sentence))
-            print('TAGGED TEXT: ' + tagged_text)
             for wordtag in tagged_text:
                 if wordtag[1] == 'JJ':
                     print('I FOUND AN ADJECTIVE. IT IS: ' + wordtag[0])
@@ -215,11 +214,11 @@ class CensorHelper:
         censored = []
 
         for node in adjectives:
-            new_node = self.replace_word(node, self.find_antonym, censorship)
+            new_node = self.replace_word(node, 'a', self.find_antonym, censorship)
             censored.append(new_node)
 
         for node in nouns:
-            new_node = self.replace_word(node, self.find_hypernym, censorship)
+            new_node = self.replace_word(node, 'n', self.find_hypernym, censorship)
             censored.append(node)
         
         return censored
@@ -231,12 +230,13 @@ class CensorHelper:
 
         for node in adjectives:
             word = node.text
-            prefix = '<div class=\"tooltip\">'
-            suffix = '<span class=\"tooltiptext\">' + word + '</span></div>'
-            classes = self.classifier.classify(self.classifier_id, word)
-            confidence = classes['classes'][0]['confidence']
-            if confidence >= 0.92:
-                replacement = prefix + '<del>' + word + '</del>' + suffix
+
+            formatted_word = word+'.a.01'
+            sentiment = swn.senti_synset(formatted_word)
+            obj_score = float(sentiment.obj_score())
+
+            if obj_score < 0.5:
+                replacement = '<del>' + word + '</del>'
                 node.update_text(replacement)
                 censored.append(node)
             else:
@@ -244,9 +244,11 @@ class CensorHelper:
 
         for node in nouns:
             word = node.text
-            classes = self.classifier.classify(self.classifier_id, word)
-            confidence = classes['classes'][0]['confidence']
-            if confidence >= 0.92:
+            formatted_word = word+'.n.01'
+            sentiment = swn.senti_synset(formatted_word)
+            obj_score = float(sentiment.obj_score())
+
+            if obj_score < 0.5:
                 hypernym = self.find_hypernym(word)
                 node.update_text(hypernym)
                 censored.append(node)
@@ -255,11 +257,24 @@ class CensorHelper:
         
         return censored
 
-    def replace_word(self, node, replace, swap_class):
+    def replace_word(self, node, pos, replace, swap_class):
         word = node.text
-        classes = self.classifier.classify(self.classifier_id, word)
-        top_class = classes['top_class']
-        if top_class != swap_class:
+        formatted_word = word+'.'+pos+'.01'
+
+        sentiment = swn.senti_synset(formatted_word)
+        pos_score = float(sentiment.pos_score())
+        neg_score = float(sentiment.neg_score())
+        
+        if word == 'great':
+            classification = 'positive'
+        elif pos_score > neg_score:
+            classification = 'positive'
+        elif neg_score > pos_score:
+            classification = 'negative'
+        else:
+            classification = 'neutral'
+
+        if classification != swap_class and classification != 'neutral':
             replacement = replace(word)
             node.update_text(replacement)
 

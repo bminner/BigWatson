@@ -43,29 +43,19 @@ class HelpersTest(TestCase):
 
         return results
     
-    def create_mock_wordnode_list(self):
-        wordnodes = {'adjs':[], 'nouns':[]}
-        wordnodes['adjs'] = [
-                 WordNode('evil', LinkedIndex(0)),
-                 WordNode('stupid',LinkedIndex(0)),
-                 WordNode('good',LinkedIndex(0)),
-                 WordNode('bad',LinkedIndex(0)),
-                 WordNode('terrific',LinkedIndex(0))
-        ]
-        wordnodes['nouns'] = [
-                 WordNode('idiot',LinkedIndex(0)),
-                 WordNode('genius',LinkedIndex(0)),
-                 WordNode('man',LinkedIndex(0)),
-                 WordNode('slut',LinkedIndex(0)),
-        ]
-
-        return wordnodes
-    
     def test_censor_wordnodes_censors_to_be_positive(self):
         helper = CensorHelper()
-        wordnodes = self.create_mock_wordnode_list()
-        censored = helper.censor_wordnodes(wordnodes, 2)
-            
+        sentence = 'Nick Meyer is a sexy man with brilliant skin'
+        wordnodes = [
+                 WordNode('a', LinkedIndex(0)),
+                 WordNode('sexy', LinkedIndex(0)),
+                 WordNode('man', LinkedIndex(0)),
+                 WordNode('with', LinkedIndex(0)),
+                 WordNode('brilliant', LinkedIndex(0)),
+                 WordNode('skin', LinkedIndex(0))
+        ]
+        sentence_and_wordnodes = [(sentence, wordnodes)]
+        censored = helper.censor_wordnodes(sentence_and_wordnodes, 'negative')
 
     def create_mock_article(self):
         """Creates a mock article for use in tests"""
