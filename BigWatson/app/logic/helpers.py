@@ -226,27 +226,33 @@ class CensorHelper:
             word = node.text
 
             formatted_word = word+'.a.01'
-            sentiment = swn.senti_synset(formatted_word)
-            obj_score = float(sentiment.obj_score())
+            try:
+                sentiment = swn.senti_synset(formatted_word)
+                obj_score = float(sentiment.obj_score())
 
-            if obj_score < 0.5:
-                replacement = '<del>' + word + '</del>'
-                node.update_text(replacement)
-                censored.append(node)
-            else:
+                if obj_score < 0.5:
+                    replacement = '<del>' + word + '</del>'
+                    node.update_text(replacement)
+                    censored.append(node)
+                else:
+                    censored.append(node)
+            except:
                 censored.append(node)
 
         for node in nouns:
             word = node.text
             formatted_word = word+'.n.01'
-            sentiment = swn.senti_synset(formatted_word)
-            obj_score = float(sentiment.obj_score())
+            try:
+                sentiment = swn.senti_synset(formatted_word)
+                obj_score = float(sentiment.obj_score())
 
-            if obj_score < 0.5:
-                hypernym = self.find_hypernym(word)
-                node.update_text(hypernym)
-                censored.append(node)
-            else:
+                if obj_score < 0.5:
+                    hypernym = self.find_hypernym(word)
+                    node.update_text(hypernym)
+                    censored.append(node)
+                else:
+                    censored.append(node)
+            except:
                 censored.append(node)
         
         return censored
@@ -255,22 +261,25 @@ class CensorHelper:
         word = node.text
         formatted_word = word+'.'+pos+'.01'
 
-        sentiment = swn.senti_synset(formatted_word)
-        pos_score = float(sentiment.pos_score())
-        neg_score = float(sentiment.neg_score())
-        
-        if word == 'great':
-            classification = 'positive'
-        elif pos_score > neg_score:
-            classification = 'positive'
-        elif neg_score > pos_score:
-            classification = 'negative'
-        else:
-            classification = 'neutral'
+        try:
+            sentiment = swn.senti_synset(formatted_word)
+            pos_score = float(sentiment.pos_score())
+            neg_score = float(sentiment.neg_score())
 
-        if classification != swap_class and classification != 'neutral':
-            replacement = replace(word)
-            node.update_text(replacement)
+            if word == 'great':
+                classification = 'positive'
+            elif pos_score > neg_score:
+                classification = 'positive'
+            elif neg_score > pos_score:
+                classification = 'negative'
+            else:
+                classification = 'neutral'
+
+            if classification != swap_class and classification != 'neutral':
+                replacement = replace(word)
+                node.update_text(replacement)
+        except:
+            pass
 
         return node
 

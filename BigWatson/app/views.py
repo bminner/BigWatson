@@ -55,10 +55,10 @@ def results(request):
         result_urls = {}
         for i_i in range(0, len(censored_results)):
             i = str(i_i)
-            result_titles[i] = censored_results[i].title
-            result_summaries[i] = censored_results[i].summary
-            result_bodies[i] = censored_results[i].body
-            result_urls[i] = censored_results[i].url
+            result_titles[i] = censored_results[i_i].title
+            result_summaries[i] = censored_results[i_i].summary
+            result_bodies[i] = censored_results[i_i].body
+            result_urls[i] = censored_results[i_i].url
 
 
         # Store body data in session for use across different views
