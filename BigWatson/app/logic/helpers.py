@@ -165,12 +165,6 @@ class WordNetHelper:
 
 class CensorHelper:
 
-    def __init__(self):
-        self.classifier_id = '719427x293-nlc-242'
-        self.classifier = NaturalLanguageClassifierV1(
-                 username='4d49cfca-bcdc-4ed9-a673-5d561faac440',
-                 password='GbojuhoOT5rG')
-
     def censor_wordnodes(self, sentence_and_wordnodes, censorship):
         """
         Censors words in wordnodes dict depending on the censorship level.
