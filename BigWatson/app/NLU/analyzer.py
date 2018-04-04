@@ -82,7 +82,7 @@ def _parse_entities(response, word_lookup_func):
                         mentions[mention_index] = (mentions[mention_index][0], mentions[mention_index][1], True)
                         to_add = ''
                         if has_object and has_subject:
-                            to_add += (s['object']['text'] + s['subject']['text'])
+                            to_add += (s['object']['text'] + ' ' + s['subject']['text'])
                         elif has_object:
                             to_add += s['object']['text']
                         elif has_subject:
