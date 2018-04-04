@@ -73,13 +73,21 @@ def _parse_entities(response, word_lookup_func):
             for s in response['semantic_roles']:
                 # if sentence has subject entities and it is the entity we want
                 # OR if sentence has object entities and it is the entity we want
-                # print(json.dumps(s, sort_keys=True, indent=4))
-                if ('object' in s and 'entities' in s['subject'] and len(s['subject']['entities']) > 0 and s['subject']['entities'][0]['text'] == name) \
-                        or ('object' in s and 'entities' in s['object'] and len(s['object']['entities']) > 0 and s['object']['entities'][0]['text'] == name):
+                has_object = 'object' in s
+                has_subject = 'subject' in s
+                if (has_subject and 'entities' in s['subject'] and len(s['subject']['entities']) > 0 and s['subject']['entities'][0]['text'] in name) \
+                        or (has_object and 'entities' in s['object'] and len(s['object']['entities']) > 0 and s['object']['entities'][0]['text'] in name):
                     # if valid mentions for that entity are available and mention text is found in subject or object
-                    if mention_index < len(mentions) and (mentions[mention_index][0] in s['subject']['text'] or mentions[mention_index][0] in s['object']['text']):
+                    if mention_index < len(mentions) and ((has_subject and mentions[mention_index][0] in s['subject']['text']) or (has_object and mentions[mention_index][0] in s['object']['text'])):
                         mentions[mention_index] = (mentions[mention_index][0], mentions[mention_index][1], True)
-                        phrases.append(s['object']['text'] + ' ' + s['subject']['text'])
+                        to_add = ''
+                        if has_object and has_subject:
+                            to_add += (s['object']['text'] + s['subject']['text'])
+                        elif has_object:
+                            to_add += s['object']['text']
+                        elif has_subject:
+                            to_add += s['subject']['text']
+                        phrases.append(to_add)
                         mention_index += 1
 
             # clear mentions that had no corresponding phrase
