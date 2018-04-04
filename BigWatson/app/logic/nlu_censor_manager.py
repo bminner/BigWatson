@@ -36,7 +36,7 @@ def _censor_title_and_summary(original_article, doctree, u_censor_selection, u_q
     # find WordNodes to censor
     title_sentences_and_wordnodes = _find_word_nodes_to_censor(doctree, analyze_result.title_entities, u_query, DocTree.title_sentence_at)
     summary_sentences_and_wordnodes = _find_word_nodes_to_censor(doctree, analyze_result.summary_entities, u_query, DocTree.summary_sentence_at)
-    print(str(len(title_sentences_and_wordnodes)))
+
     # pass that list to nltk, which will change content of each WordNode
     # call Kurt's stuff here!
     # censor(title_sentences_and_wordnodes, u_censor_selection)
@@ -44,7 +44,6 @@ def _censor_title_and_summary(original_article, doctree, u_censor_selection, u_q
     ch = CensorHelper()
     censored_title_wordnodes = ch.censor_wordnodes(title_sentences_and_wordnodes, u_censor_selection)
     censored_summary_wordnodes = ch.censor_wordnodes(summary_sentences_and_wordnodes, u_censor_selection)
-    print(str(censored_summary_wordnodes))
 
     censored = Article.Article(doctree.get_title(), Article.Article.from_article(original_article).url,
                        doctree.get_summary(), Article.Article.from_article(original_article).body,

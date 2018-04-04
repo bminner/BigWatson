@@ -206,7 +206,7 @@ class HelpersTest(TestCase):
         assert(len(entity_list) == 3)
         assert(entity_list[0].name == 'Ohio State University')
         assert(entity_list[1].mentions[0][2])
-        assert(entity_list[1].phrases[0] == 'great')
+        assert(entity_list[1].phrases[0] == 'great Urban Meyer')
 
     def test_analyze(self):
         article = self.create_mock_article()
