@@ -66,6 +66,7 @@ def results(request):
         request.session['summaries'] = result_summaries
         request.session['bodies'] = result_bodies
         request.session['urls'] = result_urls
+        request.session['query'] = query
 
         request.session['censorship'] = censorship_desc
 
@@ -100,6 +101,8 @@ def result(request):
         raise
 
     body = nlu.censor_body(article, censorship, query)
+    body = '<p>' + body.replace('\n', '</p><p>')
+    body += '</p>'
 
     return render(
         request,

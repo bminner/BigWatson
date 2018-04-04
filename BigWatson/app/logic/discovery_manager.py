@@ -62,8 +62,8 @@ def query_discovery(query, count=5):
         goose_extractor = Goose({'strict':False})
         qh = QueryHelper(goose_extractor)
 
-    discovery_results = []
-    if len(discovery_query['results']) > 0:
-        discovery_results = qh.parse_discovery_results(discovery_query['results'])
+        discovery_results = []
+        if len(discovery_query['results']) > 0:
+            discovery_results = qh.parse_discovery_results(discovery_query['results'])
 
     return discovery_results

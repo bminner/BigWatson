@@ -183,13 +183,11 @@ class CensorHelper:
             tagged_text = pos_tag(word_tokenize(sentence))
             for wordtag in tagged_text:
                 if wordtag[1] == 'JJ':
-                    print('I FOUND AN ADJECTIVE. IT IS: ' + wordtag[0])
                     for node in nodes:
                         if wordtag[0] == node.text:
                             wordnodes['adjs'].append(node)
                             break
                 elif len(wordtag[0]) > 2 and (wordtag[1] == 'NN' or wordtag[1] == 'NNS'):
-                    print('I FOUND A NOUN. IT IS: ' + wordtag[0])
                     for node in nodes:
                         if wordtag[0] == node.text:
                             wordnodes['nouns'].append(node)
