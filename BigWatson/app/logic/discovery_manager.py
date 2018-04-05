@@ -20,17 +20,18 @@ small_discovery = DiscoveryV1(
 def query_discovery(query, count=5):
     """ Returns a list of Articles by querying the Discovery service """
 
-    discovery_query = small_discovery.query(environment_id=SMALL_ENVIRONMENT_ID,
-                                     collection_id=SMALL_COLLECTION_ID,
-                                     natural_language_query=query,
-                                     return_fields=['title', 'summary', 'url', 'body', 'sentiment_score'],
-                                     count=count)
-    results = discovery_query['results']
-
-    discovery_results = []
-
-    if len(results) > 0:
+    queries = ["Donald Trump", "North Korea", "Puppies", "Snakes", "France", "Nick Meyer"]
+    if query in queries:
         print("USING SMALL NEWS")
+        discovery_query = small_discovery.query(environment_id=SMALL_ENVIRONMENT_ID,
+                                         collection_id=SMALL_COLLECTION_ID,
+                                         natural_language_query=query,
+                                         return_fields=['title', 'summary', 'url', 'body', 'sentiment_score'],
+                                         count=count)
+        results = discovery_query['results']
+
+        discovery_results = []
+
         for result in results:
             title = result['title']
             url = result['url']
