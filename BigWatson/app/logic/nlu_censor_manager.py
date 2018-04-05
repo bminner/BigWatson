@@ -63,11 +63,10 @@ def censor_body(original_article, u_censor_selection, u_query):
 
     # find WordNodes to censor
     body_sentences_and_wordnodes = _find_word_nodes_to_censor(doctree, analyze_result.body_entities, u_query, DocTree.body_sentence_at)
-    print(body_sentences_and_wordnodes)
     # Perform censorship
     ch = CensorHelper()
-    censored_body_wordnodes = ch.censor_wordnodes(body_sentences_and_wordnodes, u_censor_selection)
-    print(str(censored_body_wordnodes))
+    # censored_body_wordnodes = ch.censor_wordnodes(body_sentences_and_wordnodes, u_censor_selection)
+    # print(str(censored_body_wordnodes))
 
     # censor(body_sentences_and_wordnodes, u_censor_selection)
 
@@ -84,6 +83,7 @@ def _find_word_nodes_to_censor(doctree, entity_list, u_query, sentence_at_callba
 
     # for each entity
     for e in entity_list:
+        print(e)
         # if it is the entity we are searching for
         if e.name == u_query or u_query in e.name:
             # for every mention
@@ -93,9 +93,11 @@ def _find_word_nodes_to_censor(doctree, entity_list, u_query, sentence_at_callba
                 mention_sn = sentence_at_callback(doctree, mention_wn.get_start_index())
                 # gather list of WordNodes in entity phrase
                 words_to_censor = e.phrases[i].split(' ')
+                word_nodes_to_censor = []
                 for to_censor in words_to_censor:
-                    matched_word_nodes = mention_sn.find(to_censor)
-                    word_nodes_to_censor = word_nodes_to_censor + matched_word_nodes
-                sentence_and_wordnodes.append((mention_sn.original_text, word_nodes_to_censor))
+                    # print(to_censor)
+                    # print(mention_sn.find(to_censor))
+                    word_nodes_to_censor.append(mention_sn.find(to_censor))
+                sentence_and_wordnodes.append((mention_sn.original_text, word_nodes_to_censor, mention_sn.word_nodes[0], mention_sn.word_nodes[len(mention_sn.word_nodes)-1]))
 
     return sentence_and_wordnodes

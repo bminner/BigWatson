@@ -74,6 +74,7 @@ def _parse_entities(response, word_lookup_func):
                 # if sentence has subject entities and it is the entity we want
                 # OR if sentence has object entities and it is the entity we want
                 # print(json.dumps(s, sort_keys=True, indent=4))
+
                 if ('object' in s and 'entities' in s['subject'] and len(s['subject']['entities']) > 0 and s['subject']['entities'][0]['text'] == name) \
                         or ('object' in s and 'entities' in s['object'] and len(s['object']['entities']) > 0 and s['object']['entities'][0]['text'] == name):
                     # if valid mentions for that entity are available and mention text is found in subject or object
@@ -84,7 +85,6 @@ def _parse_entities(response, word_lookup_func):
 
             # clear mentions that had no corresponding phrase
             mentions = list(filter(lambda mention: mention[2], mentions))
-
             yield Entity(name, ttype, score, mentions, phrases)
 
 
