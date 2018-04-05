@@ -9,8 +9,8 @@
             <img src="{% static 'images/big-watson-text.png' %}" alt="Big Watson">
         </div>
 
-        <form class="form" role="search" action="{% url 'results' %}" name="search-form" autocomplete="off">
-            <input class="search-bar" placeholder="Enter your query" name="query" id="query" type="text">
+        <form class="form" id="query-form" role="search" action="{% url 'results' %}" name="search-form" autocomplete="off">
+            <input class="search-bar" placeholder="Enter your query" name="query" id="query" type="text" required maxlength="100">
             <button class="search-button" type="submit">
                 Search
             </button>

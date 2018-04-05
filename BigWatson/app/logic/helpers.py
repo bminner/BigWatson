@@ -105,9 +105,11 @@ class WordNetHelper:
         
         for wordtag in tagged_text:
             if wordtag[1] == 'JJ':
+                print('I FOUND AN ADJECTIVE. IT IS: ' + wordtag[0])
                 adjs_and_nouns['adjs'].append(wordtag[0])
             elif len(wordtag[0]) > 2 and (wordtag[1] == 'NN' or wordtag[1] == 'NNS'):
-                    adjs_and_nouns['nouns'].append(wordtag[0])
+                print('I FOUND A NOUN. IT IS: ' + wordtag[0])
+                adjs_and_nouns['nouns'].append(wordtag[0])
         
         return adjs_and_nouns
 
@@ -165,6 +167,12 @@ class WordNetHelper:
 
 class CensorHelper:
 
+    def __init__(self):
+        self.classifier_id = '719427x293-nlc-242'
+        self.classifier = NaturalLanguageClassifierV1(
+            username='4d49cfca-bcdc-4ed9-a673-5d561faac440',
+            password='GbojuhoOT5rG')
+
     def censor_wordnodes(self, sentence_and_wordnodes, censorship):
         """
         Censors words in wordnodes dict depending on the censorship level.
@@ -182,7 +190,7 @@ class CensorHelper:
 
             tagged_text = pos_tag(word_tokenize(sentence))
             for wordtag in tagged_text:
-                if wordtag[1] == 'JJ':
+                if wordtag[1] == 'JJ' or wordtag[1] == 'JJS':
                     for node in nodes:
                         if wordtag[0] == node.text:
                             wordnodes['adjs'].append(node)
@@ -232,10 +240,13 @@ class CensorHelper:
                     replacement = '<del>' + word + '</del>'
                     node.update_text(replacement)
                     censored.append(node)
-                else:
-                    censored.append(node)
             except:
-                censored.append(node)
+                classes = self.classifier.classify(self.classifier_id, word)
+                confidence = classes['classes'][0]['confidence']
+                if confidence >= 0.92:
+                    replacement = 'prefix + ''<del>' + word + '</del>'
+                    node.update_text(replacement)
+                    censored.append(node)
 
         for node in nouns:
             word = node.text
@@ -248,10 +259,13 @@ class CensorHelper:
                     hypernym = self.find_hypernym(word)
                     node.update_text(hypernym)
                     censored.append(node)
-                else:
-                    censored.append(node)
             except:
-                censored.append(node)
+                classes = self.classifier.classify(self.classifier_id, word)
+                confidence = classes['classes'][0]['confidence']
+                if confidence >= 0.92:
+                    hypernym = self.find_hypernym(word)
+                    node.update_text(hypernym)
+                    censored.append(node)
         
         return censored
 
@@ -277,7 +291,12 @@ class CensorHelper:
                 replacement = replace(word)
                 node.update_text(replacement)
         except:
-            pass
+            classes = self.classifier.classify(self.classifier_id, word)
+            top_class = classes['top_class']
+            confidence = classes['classes'][0]['confidence']
+            if top_class != swap_class and confidence >= 0.92:
+                replacement = replace(word)
+                node.update_text(replacement)
 
         return node
 

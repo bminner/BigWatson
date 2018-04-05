@@ -23,6 +23,12 @@ def results(request):
 
     query = request.GET.get('query', '')
     censorship = request.GET.get('censorship', '')
+
+    query = query.lstrip()
+    query = query.rstrip()
+    if query == '':
+        return render(request, 'index.html')
+
     # Dictionary for easy conversion from censorship value to description
     censorship_dict = {'1':'negative', '2':'neutral', '3':'positive'}
 
@@ -107,5 +113,5 @@ def result(request):
     return render(
         request,
         'result.html',
-        context={'title':title, 'body': body}
+        context={'title':result_titles[resultId], 'body': body}
     )
