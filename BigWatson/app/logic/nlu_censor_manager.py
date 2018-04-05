@@ -83,7 +83,7 @@ def _find_word_nodes_to_censor(doctree, entity_list, u_query, sentence_at_callba
     # for each entity
     for e in entity_list:
         # if it is the entity we are searching for
-        if e.name == u_query or u_query in e.name:
+        if e.name.lower() == u_query.lower() or u_query.lower() in e.name.lower():
             # for every mention
             for i, mention in enumerate(e.mentions):
                 mention_wn = mention[1]
