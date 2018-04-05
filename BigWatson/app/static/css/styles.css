@@ -250,7 +250,6 @@ p#censorship {
 
 .tooltip .tooltiptext {
     visibility: hidden;
-    opacity: 0.6;
     width: 140px;
     background-color: rgb(46, 196, 182, 0.6);
     color: #fff;

@@ -73,7 +73,6 @@ def results(request):
         request.session['bodies'] = result_bodies
         request.session['urls'] = result_urls
         request.session['query'] = query
-
         request.session['censorship'] = censorship_desc
 
     return render(
