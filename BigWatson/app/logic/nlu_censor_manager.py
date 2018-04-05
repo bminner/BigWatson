@@ -63,12 +63,11 @@ def censor_body(original_article, u_censor_selection, u_query):
 
     # find WordNodes to censor
     body_sentences_and_wordnodes = _find_word_nodes_to_censor(doctree, analyze_result.body_entities, u_query, DocTree.body_sentence_at)
+    # print(body_sentences_and_wordnodes)
+
     # Perform censorship
     ch = CensorHelper()
-    # censored_body_wordnodes = ch.censor_wordnodes(body_sentences_and_wordnodes, u_censor_selection)
-    # print(str(censored_body_wordnodes))
-
-    # censor(body_sentences_and_wordnodes, u_censor_selection)
+    censored_body_wordnodes = ch.censor_wordnodes(body_sentences_and_wordnodes, u_censor_selection)
 
     censored = doctree.get_body()
 
@@ -83,7 +82,6 @@ def _find_word_nodes_to_censor(doctree, entity_list, u_query, sentence_at_callba
 
     # for each entity
     for e in entity_list:
-        print(e)
         # if it is the entity we are searching for
         if e.name == u_query or u_query in e.name:
             # for every mention
@@ -97,7 +95,9 @@ def _find_word_nodes_to_censor(doctree, entity_list, u_query, sentence_at_callba
                 for to_censor in words_to_censor:
                     # print(to_censor)
                     # print(mention_sn.find(to_censor))
-                    word_nodes_to_censor.append(mention_sn.find(to_censor))
+                    found = mention_sn.find(to_censor)
+                    for f in found:
+                        word_nodes_to_censor.append(f)
                 sentence_and_wordnodes.append((mention_sn.original_text, word_nodes_to_censor, mention_sn.word_nodes[0], mention_sn.word_nodes[len(mention_sn.word_nodes)-1]))
 
     return sentence_and_wordnodes
