@@ -54,7 +54,7 @@ class HelpersTest(TestCase):
                  WordNode('brilliant', LinkedIndex(0)),
                  WordNode('skin', LinkedIndex(0))
         ]
-        sentence_and_wordnodes = [(sentence, wordnodes)]
+        sentence_and_wordnodes = [(sentence, wordnodes, wordnodes[0], wordnodes[5])]
         censored = helper.censor_wordnodes(sentence_and_wordnodes, 'negative')
 
     def create_mock_article(self):
