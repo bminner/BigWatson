@@ -2,7 +2,7 @@ __author__ = 'Nicholas'
 
 import string
 import random
-from ..logic import discovery_manager
+from BigWatson.app.logic import discovery_manager
 from watson_developer_cloud import DiscoveryV1
 import os
 import json
@@ -17,8 +17,15 @@ discovery = DiscoveryV1(
 )
 
 
-queries = ["donald trump", "north korea", "puppies", "snakes", "france"]
+def add_docs(filenames):
+    for fname in filenames:
+        with open(fname) as fileinfo:
+            add_doc = discovery.add_document(DISC_ENVIRONMENT_ID, DISC_COLLECTION_ID, file=fileinfo)
+        print(json.dumps(add_doc, indent=2))
 
+
+#queries = ["donald trump", "north korea", "puppies", "snakes", "france"]
+queries = ["Nick Meyer"]
 for query in queries:
     print(query)
     results = discovery_manager.query_discovery(query, 10)
@@ -48,8 +55,8 @@ for query in queries:
             os.remove(del_file)
             del_file = ""
 
+
     print(filenames)
-    for fname in filenames:
-        with open(fname) as fileinfo:
-          add_doc = discovery.add_document(DISC_ENVIRONMENT_ID, DISC_COLLECTION_ID, file=fileinfo)
-        print(json.dumps(add_doc, indent=2))
+
+    #uncomment to add files
+    #add_docs(filenames)
