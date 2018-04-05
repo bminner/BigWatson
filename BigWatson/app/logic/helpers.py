@@ -5,8 +5,11 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 from ..models.Article import Article
 from nltk.data import path as nltk_path
 nltk_path.append(dir_path + '/nltk_data')
+from nltk.corpus import wordnet as wn
+from nltk.corpus import sentiwordnet as swn
 from nltk.tag import pos_tag
 from nltk.tokenize import word_tokenize
+from watson_developer_cloud import NaturalLanguageClassifierV1
 import asyncio
 
 
@@ -102,9 +105,11 @@ class WordNetHelper:
         
         for wordtag in tagged_text:
             if wordtag[1] == 'JJ':
+                print('I FOUND AN ADJECTIVE. IT IS: ' + wordtag[0])
                 adjs_and_nouns['adjs'].append(wordtag[0])
             elif len(wordtag[0]) > 2 and (wordtag[1] == 'NN' or wordtag[1] == 'NNS'):
-                    adjs_and_nouns['nouns'].append(wordtag[0])
+                print('I FOUND A NOUN. IT IS: ' + wordtag[0])
+                adjs_and_nouns['nouns'].append(wordtag[0])
         
         return adjs_and_nouns
 
@@ -158,6 +163,193 @@ class WordNetHelper:
             text = text.replace(nounhyp[0], nounhyp[1], 1)
 
         return text
+
+
+class CensorHelper:
+
+    def __init__(self):
+        self.classifier_id = '719427x293-nlc-242'
+        self.classifier = NaturalLanguageClassifierV1(
+            username='4d49cfca-bcdc-4ed9-a673-5d561faac440',
+            password='GbojuhoOT5rG')
+
+    def censor_wordnodes(self, sentence_and_wordnodes, censorship):
+        """
+        Censors words in wordnodes dict depending on the censorship level.
+        """
+
+        total_censored = []
+
+        if censorship == 'neutral':
+            censor = self.censor_neutral
+        else:
+            censor = self.censor_pos_neg
+
+        for swse in sentence_and_wordnodes:
+            sentence = swse[0]
+            nodes = swse[1]
+            startnode = swse[2]
+            endnode = swse[3]
+            adjectives = []
+            nouns = []
+
+            tagged_text = pos_tag(word_tokenize(sentence))
+            for wordtag in tagged_text:
+                if wordtag[1] == 'JJ' or wordtag[1] == 'JJS':
+                    for node in nodes:
+                        if wordtag[0] == node.text:
+                            adjectives.append(node)
+                            break
+                elif len(wordtag[0]) > 2 and (wordtag[1] == 'NN' or wordtag[1] == 'NNS'):
+                    for node in nodes:
+                        if wordtag[0] == node.text:
+                            nouns.append(node)
+                            break
+
+            censored = censor(adjectives, nouns, censorship)
+
+            if not censored:
+                classes = self.classifier.classify(self.classifier_id, sentence)
+                top_class = classes['top_class']
+                confidence = classes['classes'][0]['confidence']
+                if top_class != censorship and confidence >= 0.92:
+                    new_start = '<del>' + startnode.text
+                    new_end = endnode.text + '</del>'
+                    startnode.update_text(new_start)
+                    endnode.update_text(new_end)
+            else:
+                total_censored += censored
+
+        # get list of censored wordnodes
+        
+        return total_censored
+    
+    def censor_pos_neg(self, adjectives, nouns, censorship):
+        """ positive/negative censorship. returns list of censored WordNodes """
+
+        censored = []
+
+        for node in adjectives:
+            new_node = self.replace_word(node, 'a', self.find_antonym, censorship)
+            censored.append(new_node)
+
+        for node in nouns:
+            new_node = self.replace_word(node, 'n', self.find_hypernym, censorship)
+            censored.append(node)
+        
+        return censored
+
+    def censor_neutral(self, adjectives, nouns, censorship):
+        """ neutral censorship. returns list of censored WordNodes. """
+
+        censored = []
+
+        for node in adjectives:
+            word = node.text
+
+            formatted_word = word+'.a.01'
+            try:
+                sentiment = swn.senti_synset(formatted_word)
+                obj_score = float(sentiment.obj_score())
+
+                if obj_score < 0.5:
+                    replacement = '<del>' + word + '</del>'
+                    node.update_text(replacement)
+                    censored.append(node)
+            except:
+                classes = self.classifier.classify(self.classifier_id, word)
+                confidence = classes['classes'][0]['confidence']
+                if confidence >= 0.92:
+                    replacement = 'prefix + ''<del>' + word + '</del>'
+                    node.update_text(replacement)
+                    censored.append(node)
+
+        for node in nouns:
+            word = node.text
+            formatted_word = word+'.n.01'
+            try:
+                sentiment = swn.senti_synset(formatted_word)
+                obj_score = float(sentiment.obj_score())
+
+                if obj_score < 0.5:
+                    hypernym = self.find_hypernym(word)
+                    node.update_text(hypernym)
+                    censored.append(node)
+            except:
+                classes = self.classifier.classify(self.classifier_id, word)
+                confidence = classes['classes'][0]['confidence']
+                if confidence >= 0.92:
+                    hypernym = self.find_hypernym(word)
+                    node.update_text(hypernym)
+                    censored.append(node)
+        
+        return censored
+
+    def replace_word(self, node, pos, replace, swap_class):
+        word = node.text
+        formatted_word = word+'.'+pos+'.01'
+
+        try:
+            sentiment = swn.senti_synset(formatted_word)
+            pos_score = float(sentiment.pos_score())
+            neg_score = float(sentiment.neg_score())
+
+            if word == 'great':
+                classification = 'positive'
+            elif pos_score > neg_score:
+                classification = 'positive'
+            elif neg_score > pos_score:
+                classification = 'negative'
+            else:
+                classification = 'neutral'
+
+            if classification != swap_class and classification != 'neutral':
+                replacement = replace(word)
+                node.update_text(replacement)
+        except:
+            classes = self.classifier.classify(self.classifier_id, word)
+            top_class = classes['top_class']
+            confidence = classes['classes'][0]['confidence']
+            if top_class != swap_class and confidence >= 0.92:
+                replacement = replace(word)
+                node.update_text(replacement)
+
+        return node
+
+    def find_antonym(self, adjective):
+        """ finds antonym for given adjective. """
+
+        prefix = '<div class=\"tooltip\">'
+        suffix = '<span class=\"tooltiptext\">' + adjective + '</span></div>'
+        syns = wn.synsets(adjective, pos=['a','s'])
+        antonym = '<del>' + adjective + '</del>'
+            
+        try:
+            for s in syns:
+                for l in s.lemmas():
+                    if l.antonyms():
+                        antonym = prefix + '<strong>' + l.antonyms()[0].name() + '</strong>' + suffix
+                        raise AntonymFound
+        except:
+            pass
+
+        return antonym
+
+    def find_hypernym(self, noun):
+        """ finds hypernym for given noun. """
+
+        prefix = '<div class=\"tooltip\">'
+        suffix = '<span class=\"tooltiptext\">' + noun + '</span></div>'
+        syns = wn.synsets(noun, pos=['n'])
+        hypernym = '<del>' + noun + '</del>'
+
+        for s in syns:
+            if s.hypernyms():
+                hypernym = prefix + '<strong>' + s.hypernyms()[0].name().split('.')[0] + '</strong>' + suffix
+                hypernym = hypernym.replace('_', ' ')
+                break
+
+        return hypernym
 
 
 class AntonymFound(Exception):

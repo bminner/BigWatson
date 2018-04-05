@@ -4,14 +4,13 @@ import asyncio
 from django.test import TestCase
 import json
 from nltk.corpus import wordnet as wn
-from ..logic.helpers import QueryHelper
+from ..logic.helpers import QueryHelper, WordNetHelper, CensorHelper
+from ..logic.nlu_censor_manager import censor_body, _censor_title_and_summary, _find_word_nodes_to_censor
+from ..logic.doctree import WordNode, LinkedIndex, DocTree
 from ..models import Article
 from ..logic import doctree as dt
-from ..logic.doctree import WordNode, DocTree
 from ..NLU import analyzer
 from ..NLU.analyzer import Entity, AnalyzeResult
-from ..logic.nlu_censor_manager import censor_body, _censor_title_and_summary, _find_word_nodes_to_censor
-from ..logic.helpers import WordNetHelper
 
 
 class HelpersTest(TestCase):
@@ -43,6 +42,20 @@ class HelpersTest(TestCase):
             results.append(result)
 
         return results
+    
+    def test_censor_wordnodes_censors_to_be_positive(self):
+        helper = CensorHelper()
+        sentence = 'Nick Meyer is a sexy man with brilliant skin'
+        wordnodes = [
+                 WordNode('a', LinkedIndex(0)),
+                 WordNode('sexy', LinkedIndex(0)),
+                 WordNode('man', LinkedIndex(0)),
+                 WordNode('with', LinkedIndex(0)),
+                 WordNode('brilliant', LinkedIndex(0)),
+                 WordNode('skin', LinkedIndex(0))
+        ]
+        sentence_and_wordnodes = [(sentence, wordnodes, wordnodes[0], wordnodes[5])]
+        censored = helper.censor_wordnodes(sentence_and_wordnodes, 'negative')
 
     def create_mock_article(self):
         """Creates a mock article for use in tests"""
@@ -193,7 +206,7 @@ class HelpersTest(TestCase):
         assert(len(entity_list) == 3)
         assert(entity_list[0].name == 'Ohio State University')
         assert(entity_list[1].mentions[0][2])
-        assert(entity_list[1].phrases[0] == 'great')
+        assert(entity_list[1].phrases[0] == 'great Urban Meyer')
 
     def test_analyze(self):
         article = self.create_mock_article()
