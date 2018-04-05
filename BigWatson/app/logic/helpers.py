@@ -178,35 +178,51 @@ class CensorHelper:
         Censors words in wordnodes dict depending on the censorship level.
         """
 
+        total_censored = []
+
         if censorship == 'neutral':
             censor = self.censor_neutral
         else:
             censor = self.censor_pos_neg
 
-        wordnodes = {'adjs':[], 'nouns':[]}
-        for pair in sentence_and_wordnodes:
-            sentence = pair[0]
-            nodes = pair[1]
+        for swse in sentence_and_wordnodes:
+            sentence = swse[0]
+            nodes = swse[1]
+            startnode = swse[2]
+            endnode = swse[3]
+            adjectives = []
+            nouns = []
 
             tagged_text = pos_tag(word_tokenize(sentence))
             for wordtag in tagged_text:
                 if wordtag[1] == 'JJ' or wordtag[1] == 'JJS':
                     for node in nodes:
                         if wordtag[0] == node.text:
-                            wordnodes['adjs'].append(node)
+                            adjectives.append(node)
                             break
                 elif len(wordtag[0]) > 2 and (wordtag[1] == 'NN' or wordtag[1] == 'NNS'):
                     for node in nodes:
                         if wordtag[0] == node.text:
-                            wordnodes['nouns'].append(node)
+                            nouns.append(node)
                             break
 
-        adjectives = wordnodes['adjs']
-        nouns = wordnodes['nouns']
+            censored = censor(adjectives, nouns, censorship)
+
+            if not censored:
+                classes = self.classifier.classify(self.classifier_id, sentence)
+                top_class = classes['top_class']
+                confidence = classes['classes'][0]['confidence']
+                if top_class != censorship and confidence >= 0.92:
+                    new_start = '<del>' + startnode.text
+                    new_end = endnode.text + '</del>'
+                    startnode.update_text(new_start)
+                    endnode.update_text(new_end)
+            else:
+                total_censored += censored
 
         # get list of censored wordnodes
-        censored = censor(adjectives, nouns, censorship)
-        return censored
+        
+        return total_censored
     
     def censor_pos_neg(self, adjectives, nouns, censorship):
         """ positive/negative censorship. returns list of censored WordNodes """
