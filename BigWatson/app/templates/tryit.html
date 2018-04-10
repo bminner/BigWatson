@@ -1,0 +1,37 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<style>
+    body {
+        background: black;
+        font-family: 'IBM Plex Mono', monospace;
+        font-weight: bold;
+    }
+</style>
+<div class="tryit">
+    <div class="tryit-title">try it yourself</div>
+    <form class="form" id="query-form" role="tryit" action="{% url 'tryit_results' %}" name="tryit-form" autocomplete="off">
+        <input type="text" class="tryit-bar" placeholder="enter a subject" name="topic" id="topic" required maxlength="100">
+        <textarea rows=10 class="tryit-bar" placeholder="enter text about the subject" name="text" id="text" type="text" required maxlength="500"></textarea>
+        <button class="tryit-button" type="submit">
+            censor
+        </button>
+        <div class="slidecontainer">
+                <p class="slider-label">censorship effect:</p>
+                <i class="fa fa-minus" aria-hidden="true"></i>
+                <input id="tryit-slider" class="slider" name="censorship" type="range" min="1" max="3" value="2">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+        </div>
+    </form>
+
+    <div id="effect-text">
+        neutral
+    </div>
+</div>
+<div class="back">
+    <a href="{% url 'index' %}"><< back</a>
+</div>
+
+{% load static %}
+<script src="{% static 'js/tryit.js' %}"></script>
+{% endblock %}

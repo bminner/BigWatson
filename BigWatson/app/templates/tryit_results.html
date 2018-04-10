@@ -1,0 +1,23 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<style>
+    body {
+        background: black;
+        font-family: 'IBM Plex Mono', monospace;
+    }
+</style>
+
+<div class="tryit">
+    <div class="tryit-container">
+        <p id="showing-results">topic: <span class="strong">{{ topic }}</span></p>
+        <p id="censorship">censorship: <span class="strong">{{ censorship }}</span></p>
+        <div style="clear:both;"></div>
+        <hr>
+        {{body|safe}}
+    </div>
+</div>
+<div class="back">
+    <a href="{% url 'tryit' %}"><< back</a>
+</div>
+{% endblock %}
