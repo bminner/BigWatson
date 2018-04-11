@@ -26,9 +26,18 @@ def analyze(doctree):
     title = doctree.original_title
     summary = doctree.original_summary
     body = doctree.original_body
-    title_entities = _parse_entities(_query_nlu(title), doctree.title_word_at) if len(title) >= MIN_TEXT_LENGTH else []
-    summary_entities = _parse_entities(_query_nlu(summary), doctree.summary_word_at) if len(summary) >= MIN_TEXT_LENGTH else []
-    body_entities = _parse_entities(_query_nlu(body), doctree.body_word_at) if len(body) >= MIN_TEXT_LENGTH else []
+    if not title == '' and ' ' in title:
+        title_entities = _parse_entities(_query_nlu(title), doctree.title_word_at)# if len(title) >= MIN_TEXT_LENGTH else []
+    else:
+        title_entities = []
+    if not summary == '':
+        summary_entities = _parse_entities(_query_nlu(summary), doctree.summary_word_at)# if len(summary) >= MIN_TEXT_LENGTH else []
+    else:
+        summary_entities = []
+    if not body == '':
+        body_entities = _parse_entities(_query_nlu(body), doctree.body_word_at) # if len(body) >= MIN_TEXT_LENGTH else []
+    else:
+        body_entities = []
 
     return AnalyzeResult(title_entities, summary_entities, body_entities)
 
