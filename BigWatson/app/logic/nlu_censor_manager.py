@@ -63,10 +63,12 @@ def censor_body(original_article, u_censor_selection, u_query):
 
     # find WordNodes to censor
     body_sentences_and_wordnodes = _find_word_nodes_to_censor(doctree, analyze_result.body_entities, u_query, DocTree.body_sentence_at)
+    # print(body_sentences_and_wordnodes)
 
     # Perform censorship
     ch = CensorHelper()
     censored_body_wordnodes = ch.censor_wordnodes(body_sentences_and_wordnodes, u_censor_selection)
+    # print(censored_body_wordnodes)
 
     censored = doctree.get_body()
 
