@@ -358,6 +358,10 @@ p#censorship {
     margin-left: -60px;
 }
 
+.tryit-container .tooltip, .tryit-container .tooltiptext {
+    background-color: black;
+}
+
 .tooltip:hover .tooltiptext {
     visibility: visible;
 }
