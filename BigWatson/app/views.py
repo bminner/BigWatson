@@ -157,7 +157,7 @@ def tryit_results(request):
         raise
     
     body_article = Article.Article(body=text)
-    body = nlu.censor_body(body_article, censorship_desc, topic)
+    body = nlu.censor_body(body_article, censorship_desc, topic, True)
     body = '<p>' + body.replace('\n', '</p><p>')
     body += '</p>'
 

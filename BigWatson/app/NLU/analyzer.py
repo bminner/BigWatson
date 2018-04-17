@@ -19,22 +19,24 @@ def init_nlu_engine():
 
 nlu = init_nlu_engine()
 
-def analyze(doctree):
+def analyze(doctree, is_try_it = False):
     """Analyzes the given DocTree and returns a generator of Entity objects. """
     assert(isinstance(doctree, DocTree))
 
+    target_text_length = 0 if is_try_it else MIN_TEXT_LENGTH
+    print('TARGET TEXT LENGTH: {}'.format(target_text_length))
     title = doctree.original_title
     summary = doctree.original_summary
     body = doctree.original_body
-    if not title == '' and ' ' in title and len(title) > MIN_TEXT_LENGTH:
+    if not title == '' and ' ' in title and len(title) > target_text_length:
         title_entities = _parse_entities(_query_nlu(title), doctree.title_word_at)# if len(title) >= MIN_TEXT_LENGTH else []
     else:
         title_entities = []
-    if not summary == '' and len(summary) > MIN_TEXT_LENGTH:
+    if not summary == '' and len(summary) > target_text_length:
         summary_entities = _parse_entities(_query_nlu(summary), doctree.summary_word_at)# if len(summary) >= MIN_TEXT_LENGTH else []
     else:
         summary_entities = []
-    if not body == '' and len(body) > MIN_TEXT_LENGTH:
+    if not body == '' and len(body) > target_text_length:
         body_entities = _parse_entities(_query_nlu(body), doctree.body_word_at) # if len(body) >= MIN_TEXT_LENGTH else []
     else:
         body_entities = []
