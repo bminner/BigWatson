@@ -414,3 +414,28 @@ p#censorship {
 .tryit-container .strong {
     font-weight: bold;
 }
+
+.contact-list {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.contact-list ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.contact-list li {
+    margin-bottom: 10px;
+}
+
+.contact-list a, .contact-list a:visited {
+    text-decoration: none;
+    color: white;
+}
+
+.contact-list a:hover {
+    color: gray;
+}

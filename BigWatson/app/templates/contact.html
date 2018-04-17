@@ -4,19 +4,42 @@
 {% block content %}
 <style>
     body {
+        background: black;
         font-family: 'IBM Plex Mono', monospace;
         font-weight: bold;
+        color: white;
+        text-align: center;
+        font-size: 16px;
     }
 </style>
-Questions? Comments? Feel free to email one of us!
-<br/><br/>
-<a href="mailto:nicholasmeyer0@gmail.com">Nick Meyer</a>
-<br/><br/>
-<a href="mailto:kuszmaul.12@osu.edu">Kurtis Kuszmaul</a>
-<br/><br/>
-<a href="mailto:groenke.5@osu.edu">Brian Groenke</a>
-<br/><br/>
-<a href="mailto:relyea.8@osu.edu">Drew Relyea</a>
-<br/><br/>
-<a href="minner.4@osu.edu">Brandon Minner</a>
+<div class="tryit">
+    <div class="tryit-container" style="background-color: black; border: 1px solid white;">
+        <br/><br/><br/><br/><br/><br/><br/><br/><br/>
+        Questions? Comments? Email one of us!
+        <br/>
+        <br/>
+        <div class="contact-list">
+            <ul>
+                <li>
+                    <a href="mailto:nicholasmeyer0@gmail.com">Nick Meyer</a>
+                </li>
+                <li>
+                    <a href="mailto:kuszmaul.12@osu.edu">Kurtis Kuszmaul</a>
+                </li>
+                <li>
+                    <a href="mailto:groenke.5@osu.edu">Brian Groenke</a>
+                </li>
+                <li>
+                    <a href="mailto:relyea.8@osu.edu">Drew Relyea</a>
+                </li>
+                <li>
+                    <a href="mailto:minner.4@osu.edu">Brandon Minner</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="back">
+    <a href="{% url 'index' %}"><< back</a>
+</div>
 {% endblock %}
