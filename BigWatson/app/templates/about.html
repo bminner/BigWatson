@@ -4,9 +4,34 @@
 {% block content %}
 <style>
     body {
+        background: black;
         font-family: 'IBM Plex Mono', monospace;
         font-weight: bold;
+        color: white;
+        text-align: center;
+        font-size: 16px;
     }
 </style>
-about
+
+<div class="tryit">
+    <div class="tryit-container" style="background-color: black; border: 1px solid white;">
+        <br/><br/><br/><br/><br/>
+        Big Watson
+        <br/>
+        <i>Confirmation bias for the 21st century</i>
+        <br/>
+        <br/> Are you tired of reading other people's opinions? Do you want to take control of your own digital version of reality?
+        If so, then look no further. Big Watson is the news search engine for you! Big Watson allows you to effortlessly
+        tailor your news to accommodate your own fragile world view. To get started, simply type in a query, choose your
+        preferred sentiment, and go!
+        <br/>
+        <br/> Big Watson is built upon the state-of-the-art natural language processing technology of IBM Watson.
+        <br/>
+        <br/> Open Source Software credit:
+        <br/> python, goose3, django, pytest, nltk, WordNet
+    </div>
+</div>
+<div class="back">
+    <a href="{% url 'index' %}"><< back</a>
+</div>
 {% endblock %}

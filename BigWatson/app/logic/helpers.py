@@ -319,8 +319,8 @@ class CensorHelper:
     def find_antonym(self, adjective):
         """ finds antonym for given adjective. """
 
-        prefix = '<div class=\"tooltip\">'
-        suffix = '<span class=\"tooltiptext\">' + adjective + '</span></div>'
+        prefix = '<span class=\"tooltip\">'
+        suffix = '<span class=\"tooltiptext\">' + adjective + '</span></span>'
         syns = wn.synsets(adjective, pos=['a','s'])
         antonym = '<del>' + adjective + '</del>'
             
@@ -338,8 +338,8 @@ class CensorHelper:
     def find_hypernym(self, noun):
         """ finds hypernym for given noun. """
 
-        prefix = '<div class=\"tooltip\">'
-        suffix = '<span class=\"tooltiptext\">' + noun + '</span></div>'
+        prefix = '<span class=\"tooltip\">'
+        suffix = '<span class=\"tooltiptext\">' + noun + '</span></span>'
         syns = wn.synsets(noun, pos=['n'])
         hypernym = '<del>' + noun + '</del>'
 
