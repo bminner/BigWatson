@@ -19,6 +19,18 @@ body {
     margin-left: -283px;
 }
 
+.tryit {
+    background-color:white;
+    border: 1px solid black;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -367px;
+    margin-left: -283px;
+    height: 733px;
+    width: 567px;
+}
+
 .querier {
     color: #ffffff;
     background-color:#5e6472;
@@ -40,6 +52,12 @@ body {
 
 .result-container {
     padding: 8px 8px;
+    height: 100%;
+    overflow: auto;
+}
+
+.tryit-container {
+    padding: 20px 20px;
     height: 100%;
     overflow: auto;
 }
@@ -79,6 +97,51 @@ body {
     margin-top: 112px;
     text-align: center;
 }
+
+.tryit .form {
+    margin-top: 32px;
+    text-align: center;
+}
+
+.tryit textarea, .tryit .tryit-bar {
+    font-family: 'IBM Plex Mono', monospace;
+    width: 93%;
+    outline: none;
+    background-color: white;
+    resize: none;
+    overflow: auto;
+    border: 1px solid black;
+    padding: 8px;
+    margin-bottom: 6px;
+    box-shadow: 3px 6px;
+}
+
+.tryit .tryit-bar {
+    margin-bottom: 15px;
+}
+
+.tryit-button {
+    font-family: 'IBM Plex Mono', monospace;
+    border: none;
+    color: #ffffff;
+    font-weight: bold;
+    background: black;
+    padding: 16px 24px 16px 24px;
+    margin: 20px 0px 16px 0px;
+    text-decoration: none;
+    -webkit-transition: all .1s ease-out;
+            transition: all .1s ease-out; 
+}
+
+.tryit-button:hover {
+    background: #333333;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+tryit::-moz-focus-inner {
+    border: 0;
+} 
 
 .search-bar {
     -webkit-border-radius: 50;
@@ -127,6 +190,10 @@ button::-moz-focus-inner {
     font-size: 20px;
 }
 
+.tryit .slidecontainer {
+    margin-top: 45px;
+}
+
 p.slider-label {
     margin-bottom: 16px;
     padding: 0;
@@ -136,6 +203,19 @@ p.slider-label {
     width: 80%;
     margin: 0 20px;
     outline: none;
+}
+
+.tryit .slider {
+    width: 75%;
+}
+
+.tryit .slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 0;
+    border: none;
+    background: black;
+    cursor: pointer;
 }
 
 .slider::-moz-range-thumb {
@@ -187,6 +267,13 @@ margin-left: -11px;
     text-decoration: none;
 }
 
+.tryit-title {
+    text-align: center;
+    font-size: 32px;
+    margin-top: 32px;
+    font-weight: bold;
+}
+
 hr {
     color: #ffffff;
     margin: 16px 0px 16px 0px;
@@ -212,6 +299,12 @@ img {
     position: fixed;
     left: 50%;
     margin-left: -158px;
+}
+
+#effect-text {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 20px;
 }
 
 #effect-expression {
@@ -251,7 +344,7 @@ p#censorship {
 .tooltip .tooltiptext {
     visibility: hidden;
     width: 140px;
-    background-color: #5e6472;
+    background-color: #2ec4b6;
     color: #fff;
     text-align: center;
     border-radius: 6px;
@@ -265,6 +358,59 @@ p#censorship {
     margin-left: -60px;
 }
 
+.tryit-container .tooltiptext {
+    background-color: black;
+}
+
 .tooltip:hover .tooltiptext {
     visibility: visible;
+}
+
+/* Naviagation List */
+.navigation {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: bold;
+    font-size: 18px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: 280px;
+    margin-left: 259px;
+}
+
+.navigation ul {
+    list-style-type: none;
+}
+
+.navigation a, .navigation a:visited {
+    text-decoration: none;
+    color: black;
+}
+
+.navigation a:hover {
+    color: gray;
+}
+
+.back {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: bold;
+    font-size: 18px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -368px;
+    margin-left: -388px;
+}
+
+.back a, .back a:visited {
+    text-decoration: none;
+    color: white;
+}
+
+.back a:hover {
+    color: gray;
+}
+
+.tryit-container .strong {
+    font-weight: bold;
 }

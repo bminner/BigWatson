@@ -88,7 +88,6 @@ def result(request):
 
     censorship = request.session.get('censorship', '')
     resultId = request.GET.get('resultId', '')
-    title = request.GET.get('title', '')
     query = request.session.get('query', '')
     result_titles = request.session.get('titles', '')
     result_summaries = request.session.get('summaries', '')
@@ -114,3 +113,55 @@ def result(request):
         'result.html',
         context={'title':result_titles[resultId], 'body': body}
     )
+
+def about(request):
+    """ about.html template """
+
+    return render(request, 'about.html')
+
+def contact(request):
+    """ contact.html template """
+
+    return render(request, 'contact.html')
+
+def tryit(request):
+    """ tryit.html template """
+
+    return render(request, 'tryit.html')
+
+def tryit_results(request):
+    """ tryit_results.html template """
+
+    topic = request.GET.get('topic', '')
+    text = request.GET.get('text', '')
+    censorship = request.GET.get('censorship', '')
+
+    topic = topic.lstrip()
+    topic = topic.rstrip()
+    text = text.lstrip()
+    text = text.rstrip()
+    if topic == '' or text == '':
+        return render(request, 'tryit.html')
+
+    # Dictionary for easy conversion from censorship value to description
+    censorship_dict = {'1':'negative', '2':'neutral', '3':'positive'}
+
+    censorship_desc = ''
+    try:
+        censorship_desc = censorship_dict[censorship]
+    except KeyError:
+        censorship = '2'
+        censorship_desc = 'neutral'
+        logging.exception('Invalid censorship value provided')
+    except:
+        raise
+    
+    body_article = Article.Article(body=text)
+    body = nlu.censor_body(body_article, censorship_desc, topic, True)
+    body = '<p>' + body.replace('\n', '</p><p>')
+    body += '</p>'
+
+    return render(request, 'tryit_results.html', context={
+             'topic': topic,
+             'censorship': censorship_desc,
+             'body': body})

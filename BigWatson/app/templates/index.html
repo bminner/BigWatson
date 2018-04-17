@@ -28,6 +28,19 @@
         </div>
     </div>
 </div>
+<div class="navigation">
+    <ul>
+        <li>
+            <a href="{% url 'about' %}">about</a>
+        </li>
+        <li>
+            <a href="{% url 'contact' %}">contact</a>
+        </li>
+        <li>
+            <a href="{% url 'tryit' %}">try it yourself</a>
+        </li>
+    </ul>
+</div>
 
 {% load static %}
 <script src="{% static 'js/index.js' %}"></script>

@@ -4,7 +4,7 @@ from ..logic.doctree import DocTree, LinkedIndex
 from watson_developer_cloud import NaturalLanguageUnderstandingV1
 import json
 
-MIN_TEXT_LENGTH = 50
+MIN_TEXT_LENGTH = 30
 
 
 def init_nlu_engine():
@@ -19,16 +19,27 @@ def init_nlu_engine():
 
 nlu = init_nlu_engine()
 
-def analyze(doctree):
+def analyze(doctree, is_try_it = False):
     """Analyzes the given DocTree and returns a generator of Entity objects. """
     assert(isinstance(doctree, DocTree))
 
+    target_text_length = 0 if is_try_it else MIN_TEXT_LENGTH
+    print('TARGET TEXT LENGTH: {}'.format(target_text_length))
     title = doctree.original_title
     summary = doctree.original_summary
     body = doctree.original_body
-    title_entities = _parse_entities(_query_nlu(title), doctree.title_word_at) if len(title) >= MIN_TEXT_LENGTH else []
-    summary_entities = _parse_entities(_query_nlu(summary), doctree.summary_word_at) if len(summary) >= MIN_TEXT_LENGTH else []
-    body_entities = _parse_entities(_query_nlu(body), doctree.body_word_at) if len(body) >= MIN_TEXT_LENGTH else []
+    if not title == '' and ' ' in title and len(title) > target_text_length:
+        title_entities = _parse_entities(_query_nlu(title), doctree.title_word_at)# if len(title) >= MIN_TEXT_LENGTH else []
+    else:
+        title_entities = []
+    if not summary == '' and len(summary) > target_text_length:
+        summary_entities = _parse_entities(_query_nlu(summary), doctree.summary_word_at)# if len(summary) >= MIN_TEXT_LENGTH else []
+    else:
+        summary_entities = []
+    if not body == '' and len(body) > target_text_length:
+        body_entities = _parse_entities(_query_nlu(body), doctree.body_word_at) # if len(body) >= MIN_TEXT_LENGTH else []
+    else:
+        body_entities = []
 
     return AnalyzeResult(title_entities, summary_entities, body_entities)
 
@@ -49,12 +60,16 @@ def _query_nlu(text):
 
 def _parse_entities(response, word_lookup_func):
     """Given JSON response from NLU query, replace mentions with proper WordNode and construct Entities"""
-    #print(json.dumps(response, sort_keys=True, indent=4))
+    # print(json.dumps(response, sort_keys=True, indent=4))
+
+    last_sentence = ''
 
     if 'entities' in response:
 
         # for each entity found
         for e in response['entities']:
+
+            curr_length = 0
 
             # extract info
             name = e['text']
@@ -73,15 +88,23 @@ def _parse_entities(response, word_lookup_func):
             for s in response['semantic_roles']:
                 # if sentence has subject entities and it is the entity we want
                 # OR if sentence has object entities and it is the entity we want
-                # print(json.dumps(s, sort_keys=True, indent=4))
 
                 if ('object' in s and 'entities' in s['subject'] and len(s['subject']['entities']) > 0 and s['subject']['entities'][0]['text'] == name) \
                         or ('object' in s and 'entities' in s['object'] and len(s['object']['entities']) > 0 and s['object']['entities'][0]['text'] == name):
+
+                    # fast forward if on to the next sentence
+                    while mention_index < len(mentions) and mentions[mention_index][1].get_start_index() < curr_length:
+                        mention_index += 1
+
                     # if valid mentions for that entity are available and mention text is found in subject or object
                     if mention_index < len(mentions) and (mentions[mention_index][0] in s['subject']['text'] or mentions[mention_index][0] in s['object']['text']):
                         mentions[mention_index] = (mentions[mention_index][0], mentions[mention_index][1], True)
                         phrases.append(s['object']['text'] + ' ' + s['subject']['text'])
                         mention_index += 1
+
+                if not s['sentence'] == last_sentence:
+                    curr_length += len(s['sentence'])
+                    last_sentence = s['sentence']
 
             # clear mentions that had no corresponding phrase
             mentions = list(filter(lambda mention: mention[2], mentions))
